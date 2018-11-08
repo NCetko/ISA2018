@@ -2,7 +2,8 @@
 
 Setup:
 -Instalirati SQL SERVER EXPRESS 2017
--Instalirati CORE SDK 2.3 : https://www.microsoft.com/net/download/thank-you/dotnet-sdk-2.2.100-preview3-windows-x64-installer
+-Instalirati CORE SDK 2.3 : 
+https://www.microsoft.com/net/download/thank-you/dotnet-sdk-2.2.100-preview3-windows-x64-installer
 -Korisiti najnoviji Visual studio, najnoviji update (proveriti updates putem Visual studio installer)
 
 Migracija:

@@ -1,4 +1,4 @@
-﻿Tehnologija: ASP NET Core MVC
+Tehnologija: ASP NET Core MVC
 
 Setup:  
 -Instalirati SQL SERVER EXPRESS 2017  
@@ -16,14 +16,15 @@ Pre pokretanja aplikacije izvršiti sledeće komande u cmd:
 	dotnet ef migrations add InitialCreate  
 //generiše bazu  
 	dotnet ef database update  
-
-Ne pushovati migrations, bin, .vs, ili obj.
+	
 Opciono: instalirati SQL Server management studio (SSMS), ili DataGrip.
 
 Potencijalno potrebno:  
 U slučaju da projekat neće sam da se restore preko Visual Studio, u cmd u folderu projekta izvšiti: dotnet restore  
 Projekat koristi Entity Framework Core sa nuget package manager:   
 Install-Package Microsoft.EntityFrameworkCore.SqlServer -Version 2.1.4
+
+**Ne pushovati migrations, bin, .vs, ili obj!**  
 
 
 

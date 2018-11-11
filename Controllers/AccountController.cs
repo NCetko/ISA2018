@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using ISA.Data;
 using ISA.Models.AccountViewModels;
 using ISA.Models.Entities;
 using Microsoft.AspNetCore.Authentication;
@@ -10,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace ISA.Controllers
@@ -17,6 +20,7 @@ namespace ISA.Controllers
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         //private readonly IEmailSender _emailSender;
@@ -26,12 +30,14 @@ namespace ISA.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             //IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             //_emailSender = emailSender;
             _logger = logger;
+            _context = context;
         }
 
         [TempData]
@@ -108,10 +114,10 @@ namespace ISA.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-                    
+
                     // Add a user to the default role, or any role you prefer here
                     await _userManager.AddToRoleAsync(user, "User");
-                    
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     //var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     //await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
@@ -126,6 +132,55 @@ namespace ISA.Controllers
             // If we got this far, something failed, redisplay form
             return View(model);
         }
+
+        // GET: Hotel/Edit/5
+        public async Task<IActionResult> Edit()
+        {
+            var userId = (await _userManager.GetUserAsync(HttpContext.User)).Id;
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            EditViewModel userView = new EditViewModel(_context.Users.Find(userId));
+            return View(userView);
+        }
+
+        // POST: Hotel/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditViewModel userEdit)
+        {
+            var userId = (await _userManager.GetUserAsync(HttpContext.User)).Id;
+            var user = _context.Users.Find(userId);
+
+            user.FirstName = userEdit.FirstName;
+            user.LastName = userEdit.LastName;
+            user.Email = userEdit.Email;
+            user.UserName = userEdit.Email;
+            user.NormalizedUserName = userEdit.Email.Normalize();
+            user.NormalizedEmail = userEdit.Email.Normalize();
+            user.PhoneNumber = userEdit.PhoneNumber;
+            user.Address = userEdit.Address;
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await userEdit.NewImage.CopyToAsync(memoryStream);
+                user.Image = memoryStream.ToArray();
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+                return View(userEdit);
+            }
+            EditViewModel userView = new EditViewModel(_context.Users.Find(userId));
+            return View(userView);
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -154,43 +209,36 @@ namespace ISA.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPassword()
+        public IActionResult ChangePassword()
         {
-            return View();
+            var model = new ChangePasswordViewModel();
+            return View(model);
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
+                //bool result = await _userManager.CheckPasswordAsync(user, model.OldPassword);
+                var result = await _userManager.ChangePasswordAsync(user,model.OldPassword, model.Password);
+                if (result.Succeeded)
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToAction(nameof(ForgotPasswordConfirmation));
+                    return RedirectToAction(nameof(Edit));
                 }
-
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                //var callbackUrl = Url.ResetPasswordCallbackLink(user.Id, code, Request.Scheme);
-                //await _emailSender.SendEmailAsync(model.Email, "Reset Password", $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "The old password is incorrect.");
+                    return View(model);
+                }
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
         }
 
         [HttpGet]

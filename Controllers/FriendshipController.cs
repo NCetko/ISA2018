@@ -9,9 +9,12 @@ using ISA.Data;
 using ISA.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using ISA.Models.FriendshipViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ISA.Controllers
 {
+
+    [Authorize(Roles = "User")]
     public class FriendshipController : Controller
     {
         private readonly ApplicationDbContext _context;

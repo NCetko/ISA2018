@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 
 namespace ISA.Controllers
 {
-    [Authorize(Roles = "User")]
     [Route("[controller]/[action]")]
     public class AccountController : Controller
     {

@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ISA.Models.FriendshipViewModels.FriendsViewModel>
+
+@{
+    ViewData["Title"] = "Recieved Friendship Requests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<partial name="_Friendships.cshtml" />
+
+<h2>Sent</h2>
+
+<p>
+    <a asp-action="Create">Add Friends</a>
+</p>
+
+<partial name="_Filter.cshtml" />
+
+<table class="table" id="UserTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                <form action="Delete/@item.SenderId/@item.ReceiverId" method="post">
+                    <input type="hidden" id="SenderId" name="SenderId" value=@item.SenderId />
+                    <input type="hidden" id="ReceiverId" name="ReceiverId" value=@item.ReceiverId />
+                    @Html.AntiForgeryToken()
+                    <input type="submit" value="Delete" class="btn btn-default" /> |
+                </form>
+                <form action="Confirm/@item.SenderId/@item.ReceiverId" method="post">
+                    <input type="hidden" asp-for="@item.SenderId" />
+                    <input type="hidden" asp-for="@item.ReceiverId" />
+                    @Html.AntiForgeryToken()
+                    <input type="submit" value="Confirm" class="btn btn-default" />
+                </form>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

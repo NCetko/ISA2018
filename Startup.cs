@@ -13,6 +13,8 @@ using ISA.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ISA.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace ISA
 {
@@ -43,7 +45,13 @@ namespace ISA
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddMvc();
+            services.AddMvc(config => 
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                 .RequireAuthenticatedUser()
+                 .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
 
             services.AddAuthorization(options =>
             {

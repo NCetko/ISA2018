@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ISA.Models.FriendshipViewModels.FriendsViewModel>
+
+@{
+    ViewData["Title"] = "Friends";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<partial name="_Friendships.cshtml"/>
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Add Friends</a>
+</p>
+
+<partial name="_Filter.cshtml" />
+
+
+<table class="table" id="UserTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.ActionLink("Delete", "Delete", new { sender = item.SenderId, reciever = item.ReceiverId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

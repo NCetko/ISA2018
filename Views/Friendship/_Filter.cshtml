@@ -1,0 +1,26 @@
+<input type="text" class="form-control" id="FirstNameInput" onkeyup="filterFunction()" placeholder="First Name..." title="Enter user's last name.">
+</br>
+<input type="text" class="form-control" id="LastNameInput" onkeyup="filterFunction()" placeholder="Last Name..." title="Enter user's first name.">
+
+<script>
+    function filterFunction() {
+        FirstName = document.getElementById("FirstNameInput").value.toUpperCase();
+        LastName = document.getElementById("LastNameInput").value.toUpperCase();
+        table = document.getElementById("UserTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                if (td.innerHTML.toUpperCase().indexOf(FirstName) > -1) {
+                    if (td.innerHTML.toUpperCase().indexOf(LastName) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>

@@ -1,0 +1,53 @@
+﻿@model IEnumerable<ISA.Models.FriendshipViewModels.CreateViewModel>
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<partial name="_Friendships.cshtml" />
+<h2>Add Friends</h2>
+<hr />
+
+<partial name="_Filter.cshtml" />
+
+<table class="table" id="UserTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    <form action="Create/@item.ReceiverId" method="post">
+                        <input type="hidden" id="ReceiverId" name="ReceiverId" value=@item.ReceiverId />
+                        @Html.AntiForgeryToken()
+                        <input type="submit" value="Send request" class="btn btn-default" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Friends">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

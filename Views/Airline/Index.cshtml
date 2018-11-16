@@ -1,0 +1,82 @@
+﻿@model IEnumerable<ISA.Models.Entities.Airline>
+@using ISA.Models.Entities
+@inject ApplicationDbContext Context
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h2>Airlines</h2>
+@{
+    var userId ="";
+
+    if (User.Identity.IsAuthenticated)
+    {
+        userId = (await UserManager.GetUserAsync(User)).Id;
+
+        if (User.IsInRole("SysAdmin"))
+        {
+            <p><a asp-action="Create">Create New</a></p>
+        }
+    }
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AirlineName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AirlineName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @if (item.Image != null)
+                    {
+                        var base64 = Convert.ToBase64String(item.Image);
+                        var imgSrc = String.Format("data:image/png;base64,{0}", base64);
+                        <img src="@imgSrc" style="max-width:200px; max-height:200px" />
+                    }
+                </td>
+                <td>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == item.Provider))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.AirlineName">Edit</a>
+                        <span> | </span>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.AirlineName">Details</a>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("SysAdmin"))
+                    {
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.AirlineName">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

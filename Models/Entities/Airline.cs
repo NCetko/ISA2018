@@ -24,7 +24,7 @@ namespace ISA.Models.Entities
         [StringLength(500)]
         public string Description { get; set; }
 
-        public ICollection<Airplane> Airplane { get; set; }
+        public ICollection<Airplane> Airplanes { get; set; }
 
         [Required(ErrorMessage = "Required")]
         public Ratable Ratable { get; set; }

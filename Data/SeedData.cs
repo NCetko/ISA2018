@@ -484,34 +484,69 @@ namespace ISA.Data
                 {
                     SegmentName = "Economy",
                     Airplane = context.Airplanes.Find("Airplane 1"),
-                    Color = "red"
+                    Color = "turquoise"
                 },
                 new Segment
                 {
                     SegmentName = "Business",
                     Airplane = context.Airplanes.Find("Airplane 1"),
-                    Color = "green"
+                    Color = "royalblue"
                 }
             );
 
             context.SaveChanges();
 
-            context.Seats.AddRange(
-                new Seat
+            for (int i = 0; i < 15; i++)
+            {
+                for (int j = 0; j < 3; j++)
                 {
-                    SeatName = "1A",
-                    Segment = context.Segments.Find("Airplane 1", "Economy"),
-                    X = 50,
-                    Y = 50
-                },
-                new Seat
-                {
-                    SeatName = "2A",
-                    Segment = context.Segments.Find("Airplane 1", "Business"),
-                    X = 50,
-                    Y = 75
+                    context.Seats.Add(
+                        new Seat
+                        {
+                            SeatName = (i + 1).ToString() + NumToLetter(j + 1),
+                            Segment = context.Segments.Find("Airplane 1", "Economy"),
+                            X = 50 + i * 50,
+                            Y = 100 + j * 50
+                        }
+                    );
+
+                    context.Seats.Add(
+                        new Seat
+                        {
+                            SeatName = (i + 1).ToString() + NumToLetter(j + 3 + 1),
+                            Segment = context.Segments.Find("Airplane 1", "Economy"),
+                            X = 50 + i * 50,
+                            Y = 300 + j * 50
+                        }
+                    );
                 }
-            );
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    context.Seats.Add(
+                        new Seat
+                        {
+                            SeatName = (i + 1 + 15).ToString() + NumToLetter(j + 1),
+                            Segment = context.Segments.Find("Airplane 1", "Business"),
+                            X = 850 + i * 50,
+                            Y = 100 + j * 50
+                        }
+                    );
+
+                    context.Seats.Add(
+                        new Seat
+                        {
+                            SeatName = (i + 1 + 15).ToString() + NumToLetter(j + 3 + 1),
+                            Segment = context.Segments.Find("Airplane 1", "Business"),
+                            X = 850 + i * 50,
+                            Y = 300 + j * 50
+                        }
+                    );
+                }
+            }
 
             context.SaveChanges();
 
@@ -889,6 +924,16 @@ namespace ISA.Data
 
                 context.SaveChanges();
             }
+        }
+
+        private static String NumToLetter(int broj)
+
+        {
+
+            Char c = (Char)(65 + (broj - 1));
+
+            return c.ToString();
+
         }
     }
 }

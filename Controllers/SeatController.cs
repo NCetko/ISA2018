@@ -7,29 +7,26 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ISA.Data;
 using ISA.Models.Entities;
-using Microsoft.AspNetCore.Authorization;
-using ISA.Models.AirlineViewModels;
-using System.IO;
 
 namespace ISA.Controllers
 {
-    [AllowAnonymous]
-    public class AirlineController : Controller
+    public class SeatController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public AirlineController(ApplicationDbContext context)
+        public SeatController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Airline
+        // GET: Seat
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Airlines.Include(a => a.Provider).ToListAsync());
+            var applicationDbContext = _context.Seats.Include(s => s.Segment);
+            return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: Airline/Details/5
+        // GET: Seat/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -37,51 +34,42 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airline = await _context.Airlines
-                .Include(a => a.Provider).FirstOrDefaultAsync(m => m.AirlineName == id);
-            if (airline == null)
+            var seat = await _context.Seats
+                .Include(s => s.Segment)
+                .FirstOrDefaultAsync(m => m.AirplaneName == id);
+            if (seat == null)
             {
                 return NotFound();
             }
 
-            return View(airline);
+            return View(seat);
         }
 
-        // GET: Airline/Create
+        // GET: Seat/Create
         public IActionResult Create()
         {
+            ViewData["AirplaneName"] = new SelectList(_context.Segments, "AirplaneName", "AirplaneName");
             return View();
         }
 
-        // POST: Airline/Create
+        // POST: Seat/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateViewmModel viewModel)
+        public async Task<IActionResult> Create([Bind("SeatName,SegmentName,AirplaneName,X,Y")] Seat seat)
         {
-            Airline airline = new Airline {
-                AirlineName = viewModel.AirlineName,
-                Address = viewModel.Address,
-                Description = viewModel.Description
-            };
-
-            using (var memoryStream = new MemoryStream())
-            {
-                await viewModel.Image.CopyToAsync(memoryStream);
-                airline.Image = memoryStream.ToArray();
-            }
-
             if (ModelState.IsValid)
             {
-                _context.Add(airline);
+                _context.Add(seat);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(airline);
+            ViewData["AirplaneName"] = new SelectList(_context.Segments, "AirplaneName", "AirplaneName", seat.AirplaneName);
+            return View(seat);
         }
 
-        // GET: Airline/Edit/5
+        // GET: Seat/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -89,46 +77,37 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airline = await _context.Airlines.FindAsync(id);
-            if (airline == null)
+            var seat = await _context.Seats.FindAsync(id);
+            if (seat == null)
             {
                 return NotFound();
             }
-            return View(new EditViewModel(airline));
+            ViewData["AirplaneName"] = new SelectList(_context.Segments, "AirplaneName", "AirplaneName", seat.AirplaneName);
+            return View(seat);
         }
 
-        // POST: Airline/Edit
+        // POST: Seat/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(EditViewModel viewModel)
+        public async Task<IActionResult> Edit(string id, [Bind("SeatName,SegmentName,AirplaneName,X,Y")] Seat seat)
         {
-            Airline airline = _context.Airlines.Find(viewModel.AirlineName);
-            if(airline == null)
+            if (id != seat.AirplaneName)
             {
                 return NotFound();
-            }
-
-            airline.Address = viewModel.Address;
-            airline.Description = viewModel.Description;
-
-            using (var memoryStream = new MemoryStream())
-            {
-                await viewModel.NewImage.CopyToAsync(memoryStream);
-                airline.Image = memoryStream.ToArray();
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(airline);
+                    _context.Update(seat);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AirlineExists(airline.AirlineName))
+                    if (!SeatExists(seat.AirplaneName))
                     {
                         return NotFound();
                     }
@@ -139,10 +118,11 @@ namespace ISA.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(airline);
+            ViewData["AirplaneName"] = new SelectList(_context.Segments, "AirplaneName", "AirplaneName", seat.AirplaneName);
+            return View(seat);
         }
 
-        // GET: Airline/Delete/5
+        // GET: Seat/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -150,30 +130,31 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airline = await _context.Airlines
-                .FirstOrDefaultAsync(m => m.AirlineName == id);
-            if (airline == null)
+            var seat = await _context.Seats
+                .Include(s => s.Segment)
+                .FirstOrDefaultAsync(m => m.AirplaneName == id);
+            if (seat == null)
             {
                 return NotFound();
             }
 
-            return View(airline);
+            return View(seat);
         }
 
-        // POST: Airline/Delete/5
+        // POST: Seat/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var airline = await _context.Airlines.FindAsync(id);
-            _context.Airlines.Remove(airline);
+            var seat = await _context.Seats.FindAsync(id);
+            _context.Seats.Remove(seat);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AirlineExists(string id)
+        private bool SeatExists(string id)
         {
-            return _context.Airlines.Any(e => e.AirlineName == id);
+            return _context.Seats.Any(e => e.AirplaneName == id);
         }
     }
 }

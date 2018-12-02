@@ -1,0 +1,37 @@
+﻿@model ISA.Models.Entities.Seat
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Seat</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Segment)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Segment.AirplaneName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.X)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.X)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Y)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Y)
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

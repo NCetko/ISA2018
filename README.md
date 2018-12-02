@@ -8,7 +8,6 @@ https://www.microsoft.com/net/download/thank-you/dotnet-sdk-2.2.100-preview3-win
 
 Migracija:  
 Baza je code-first pomoću Entity Framework Core.   
-U appsettings.json, proveriti da li je pravi server izabran ( Server=Naziv_Racunara\\SQLEXPRESS )  
 Navigirati cmd do foldera projekta. Ako postoji migrations folder, obrisati ga. Ako postoji ISA baza, obrisati je.
 Pre pokretanja aplikacije izvršiti sledeće komande u cmd:
 

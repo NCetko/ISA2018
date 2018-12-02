@@ -26,7 +26,7 @@ namespace ISA.ViewComponents
                 return(null);
             }
 
-            return View(await _context.Airplanes.Where(a => a.Airline.AirlineName == airlineName).ToListAsync());
+            return View(await _context.Airplanes.Include(a=>a.Airline).Include(a => a.Airline.Provider).Where(a => a.Airline.AirlineName == airlineName).ToListAsync());
         }
     }
 }

@@ -19,10 +19,10 @@ namespace ISA.Models.Entities
         [ForeignKey("AirplaneName, SegmentName")]
         public Segment Segment { get; set; }
 
-        [Required(ErrorMessage = "Neophodno")]
+        [Required(ErrorMessage = "Required")]
         public int X { get; set; }
 
-        [Required(ErrorMessage = "Neophodno")]
+        [Required(ErrorMessage = "Required")]
         public int Y { get; set; }
 
     }

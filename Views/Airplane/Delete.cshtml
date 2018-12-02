@@ -17,6 +17,6 @@
     <form asp-action="Delete">
         <input type="hidden" asp-for="AirplaneName" />
         <input type="submit" value="Delete" class="btn btn-default" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Details" asp-controller="Airline" asp-route-id="@Model.Airline.AirlineName">Back to List</a>
     </form>
 </div>

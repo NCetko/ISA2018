@@ -40,7 +40,7 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airplane = await _context.Airplanes
+            var airplane = await _context.Airplanes.Include(a=>a.Airline).Include(a=>a.Airline.Provider)
                 .FirstOrDefaultAsync(m => m.AirplaneName == id);
             if (airplane == null)
             {
@@ -60,7 +60,7 @@ namespace ISA.Controllers
             CreateViewModel viewModel = new CreateViewModel {
                 AirlineName = AirlineName
             };
-            return View();
+            return View(viewModel);
         }
 
         // POST: Airplane/Create
@@ -91,7 +91,7 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airplane = await _context.Airplanes
+            var airplane = await _context.Airplanes.Include(a=>a.Airline)
                 .FirstOrDefaultAsync(m => m.AirplaneName == id);
             if (airplane == null)
             {

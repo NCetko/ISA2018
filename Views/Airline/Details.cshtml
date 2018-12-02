@@ -1,8 +1,21 @@
 ﻿@model ISA.Models.Entities.Airline
+@using ISA.Models.Entities
+@inject ApplicationDbContext Context
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@{
+    var userId = "";
+
+    if (User.Identity.IsAuthenticated)
+    {
+        userId = (await UserManager.GetUserAsync(User)).Id;
+    }
 }
 
 <h2>Details</h2>
@@ -40,9 +53,12 @@
             }
         </dd>
     </dl>
-    @await Component.InvokeAsync("Airplanes", new { airlineName = Model.AirlineName  } )
+    @await Component.InvokeAsync("Airplanes", new { airlineName = Model.AirlineName })
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.AirlineName">Edit</a> |
+    @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == Model.Provider)) || User.IsInRole("SysAdmin")))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.AirlineName">Edit</a> <span> | </span>
+    }
     <a asp-action="Index">Back to List</a>
 </div>

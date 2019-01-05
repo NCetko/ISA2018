@@ -1,4 +1,4 @@
-﻿@model ISA.Models.Entities.Seat
+﻿@model ISA.Models.SeatViewModels.EditViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -13,10 +13,22 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Segment)
+            @Html.DisplayNameFor(model => model.AirplaneName)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Segment.AirplaneName)
+            @Html.DisplayFor(model => model.AirplaneName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SegmentName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SegmentName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SeatName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SeatName)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.X)

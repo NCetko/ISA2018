@@ -1,4 +1,6 @@
-﻿@model ISA.Models.Entities.Seat
+﻿@model ISA.Models.SeatViewModels.EditViewModel
+
+<script src="@Url.Content("~/lib/konva.min.js")"></script>
 
 @{
     ViewData["Title"] = "Edit";
@@ -13,9 +15,20 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="SeatName" />
-            <input type="hidden" asp-for="SegmentName" />
-            <input type="hidden" asp-for="AirplaneName" />
+            <div class="form-group">
+                <label asp-for="AirplaneName" class="control-label"></label>
+                <input readonly asp-for="AirplaneName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SegmentName" class="control-label"></label>
+                <input readonly asp-for="SegmentName" class="form-control" />
+                @*<select asp-for="SegmentName" class="form-control" asp-items="new SelectList(ViewBag.Segments, @{"SegmentName"}, @{"SegmentName"})"></select>*@
+            </div>
+            <div class="form-group">
+                <label asp-for="SeatName" class="control-label"></label>
+                <input readonly asp-for="SeatName" class="form-control" />
+            </div>
+            <hr />
             <div class="form-group">
                 <label asp-for="X" class="control-label"></label>
                 <input asp-for="X" class="form-control" />
@@ -33,6 +46,8 @@
     </div>
 </div>
 
+<div id="container" style="width:1000px; height:500px; margin: auto; padding-top: 50px; overflow: hidden"></div>
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
@@ -40,3 +55,85 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+<script>
+    var stage = new Konva.Stage({
+        container: 'container',
+        width: 1000,
+        height: 500
+    });
+
+    var layer = new Konva.Layer();
+
+    var selected = new String('0');
+    var prevColor = 'black';
+    var segments = [];
+</script>
+
+@foreach (var segment in ViewBag.Segments)
+{
+    <script>
+            segments['@Html.Raw(segment.SegmentName)']='@Html.Raw(segment.Color)'
+    </script>
+}
+
+@foreach (var seat in ViewBag.Seats)
+{
+    <script>
+        var scale = 2;
+        var seat = new Konva.Shape({
+            sceneFunc: function (context, shape) {
+            context.beginPath();
+                context.moveTo(@Html.Raw(seat.X)-10 * scale, @Html.Raw(seat.Y)-9 * scale);
+                context.lineTo(@Html.Raw(seat.X)-5 * scale, @Html.Raw(seat.Y)+8 * scale);
+                context.lineTo(@Html.Raw(seat.X)+7.5 * scale, @Html.Raw(seat.Y)+8 * scale);
+                context.quadraticCurveTo(@Html.Raw(seat.X)+12 * scale, @Html.Raw(seat.Y)+1 * scale,
+                    @Html.Raw(seat.X)+8 * scale, @Html.Raw(seat.Y) + 0 * scale);
+                context.lineTo(@Html.Raw(seat.X)+ 0 * scale, @Html.Raw(seat.Y)+0.5 * scale);
+                context.lineTo(@Html.Raw(seat.X)-3 * scale, @Html.Raw(seat.Y)-8 * scale);
+                context.quadraticCurveTo(@Html.Raw(seat.X)-4 * scale, @Html.Raw(seat.Y)-10 * scale,
+                    @Html.Raw(seat.X)-10 * scale, @Html.Raw(seat.Y)-9 * scale);
+            context.closePath();
+
+            // (!) Konva specific method, it is very important
+            context.fillStrokeShape(shape);
+        },
+        radius: 10,
+        fill:segments['@Html.Raw(seat.SegmentName)'],
+        stroke: 'black',
+        strokeWidth: 1,
+        draggable: false,
+        id: '@Html.Raw(seat.SeatName)'
+        });
+
+        layer.add(seat);
+    </script>
+}
+<script>
+
+    // add the layer to the stage
+    stage.add(layer);
+
+</script>
+
+@{ 
+    var originalX = Model.X;
+    var originalY = Model.Y;
+}
+
+<script>
+    var shape = stage.findOne('#@Html.Raw(Model.SeatName)');
+    shape.fill('White');
+    layer.draw();
+
+        document.getElementById('X').addEventListener('input', function () {
+                shape.x(document.getElementById('X').value -@Html.Raw(originalX));
+                layer.draw();
+        })
+        document.getElementById('Y').addEventListener('input', function () {
+                shape.y(document.getElementById('Y').value - @Html.Raw(originalY));
+                layer.draw();
+        })
+</script>
+
+

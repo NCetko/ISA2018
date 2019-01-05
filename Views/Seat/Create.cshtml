@@ -1,4 +1,6 @@
-﻿@model ISA.Models.Entities.Seat
+﻿@model ISA.Models.SeatViewModels.CreateViewModel
+
+<script src="@Url.Content("~/lib/konva.min.js")"></script>
 
 @{
     ViewData["Title"] = "Create";
@@ -19,14 +21,6 @@
                 <span asp-validation-for="SeatName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SegmentName" class="control-label"></label>
-                <select asp-for="SegmentName" class ="form-control" asp-items="ViewBag.SegmentName"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="AirplaneName" class="control-label"></label>
-                <select asp-for="AirplaneName" class ="form-control" asp-items="ViewBag.AirplaneName"></select>
-            </div>
-            <div class="form-group">
                 <label asp-for="X" class="control-label"></label>
                 <input asp-for="X" class="form-control" />
                 <span asp-validation-for="X" class="text-danger"></span>
@@ -43,6 +37,9 @@
     </div>
 </div>
 
+<div id="container" style="width:1000px; height:500px; margin: auto; padding-top: 50px; overflow: hidden"></div>
+
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
@@ -50,3 +47,112 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+
+<script>
+    var stage = new Konva.Stage({
+        container: 'container',
+        width: 1000,
+        height: 500
+    });
+
+    var layer = new Konva.Layer();
+
+    var selected = new String('0');
+    var prevColor = 'black';
+    var segments = [];
+</script>
+
+@foreach (var segment in ViewBag.Segments)
+{
+    <script>
+            segments['@Html.Raw(segment.SegmentName)']='@Html.Raw(segment.Color)'
+    </script>
+}
+
+@foreach (var seat in ViewBag.Seats)
+{
+    <script>
+        var scale = 2;
+        var seat = new Konva.Shape({
+            sceneFunc: function (context, shape) {
+            context.beginPath();
+                context.moveTo(@Html.Raw(seat.X)-10 * scale, @Html.Raw(seat.Y)-9 * scale);
+                context.lineTo(@Html.Raw(seat.X)-5 * scale, @Html.Raw(seat.Y)+8 * scale);
+                context.lineTo(@Html.Raw(seat.X)+7.5 * scale, @Html.Raw(seat.Y)+8 * scale);
+                context.quadraticCurveTo(@Html.Raw(seat.X)+12 * scale, @Html.Raw(seat.Y)+1 * scale,
+                    @Html.Raw(seat.X)+8 * scale, @Html.Raw(seat.Y) + 0 * scale);
+                context.lineTo(@Html.Raw(seat.X)+ 0 * scale, @Html.Raw(seat.Y)+0.5 * scale);
+                context.lineTo(@Html.Raw(seat.X)-3 * scale, @Html.Raw(seat.Y)-8 * scale);
+                context.quadraticCurveTo(@Html.Raw(seat.X)-4 * scale, @Html.Raw(seat.Y)-10 * scale,
+                    @Html.Raw(seat.X)-10 * scale, @Html.Raw(seat.Y)-9 * scale);
+            context.closePath();
+
+            // (!) Konva specific method, it is very important
+            context.fillStrokeShape(shape);
+        },
+        radius: 10,
+        fill:segments['@Html.Raw(seat.SegmentName)'],
+        stroke: 'black',
+        strokeWidth: 1,
+        draggable: false,
+        id: '@Html.Raw(seat.SeatName)'
+        });
+
+    // add the shape to the layer
+        layer.add(seat);
+
+    </script>
+}
+<script>
+
+    // add the layer to the stage
+    stage.add(layer);
+
+</script>
+
+@{
+    var originalX = Model.X;
+    var originalY = Model.Y;
+}
+
+<script>
+
+    // add the layer to the stage
+        var seat = new Konva.Shape({
+            sceneFunc: function (context, shape) {
+            context.beginPath();
+                context.moveTo(@Html.Raw(Model.X)-10 * scale, @Html.Raw(Model.Y)-9 * scale);
+                context.lineTo(@Html.Raw(Model.X)-5 * scale, @Html.Raw(Model.Y)+8 * scale);
+                context.lineTo(@Html.Raw(Model.X)+7.5 * scale, @Html.Raw(Model.Y)+8 * scale);
+                context.quadraticCurveTo(@Html.Raw(Model.X)+12 * scale, @Html.Raw(Model.Y)+1 * scale,
+                    @Html.Raw(Model.X)+8 * scale, @Html.Raw(Model.Y) + 0 * scale);
+                context.lineTo(@Html.Raw(Model.X)+ 0 * scale, @Html.Raw(Model.Y)+0.5 * scale);
+                context.lineTo(@Html.Raw(Model.X)-3 * scale, @Html.Raw(Model.Y)-8 * scale);
+                context.quadraticCurveTo(@Html.Raw(Model.X)-4 * scale, @Html.Raw(Model.Y)-10 * scale,
+                    @Html.Raw(Model.X)-10 * scale, @Html.Raw(Model.Y)-9 * scale);
+            context.closePath();
+
+            // (!) Konva specific method, it is very important
+            context.fillStrokeShape(shape);
+        },
+                radius: 10,
+                fill:'White',
+                stroke: 'black',
+                strokeWidth: 1,
+                draggable: false,
+                id: 'New Seat'
+        });
+
+        layer.add(seat);
+        stage.add(layer);
+
+        document.getElementById('X').addEventListener('input', function () {
+                seat.x(document.getElementById('X').value - @Html.Raw(originalX));
+                layer.draw();
+        })
+        document.getElementById('Y').addEventListener('input', function () {
+                seat.y(document.getElementById('Y').value -@Html.Raw(originalY));
+                layer.draw();
+        })
+</script>

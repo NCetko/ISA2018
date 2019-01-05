@@ -78,7 +78,7 @@ namespace ISA.Controllers
             {
                 _context.Add(airplane);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Details", "Airline", new { id = viewModel.AirlineName});
+                return RedirectToAction("Details", "Airplane", new { id = viewModel.AirplaneName});
             }
             return View(airplane);
         }

@@ -58,7 +58,8 @@
                     @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == Model.Airline.Provider)) || User.IsInRole("SysAdmin")))
                     {
                         <a asp-action="Edit" asp-controller="Segment" asp-route-airplaneName="@Model.AirplaneName" asp-route-segmentName="@segment.SegmentName">Edit</a><span> | </span>
-                        <a asp-action="Delete" asp-controller="Segment" asp-route-airplaneName="@Model.AirplaneName" asp-route-segmentName="@segment.SegmentName">Delete</a>
+                        <a asp-action="Delete" asp-controller="Segment" asp-route-airplaneName="@Model.AirplaneName" asp-route-segmentName="@segment.SegmentName">Delete</a><span> | </span>
+                        <a asp-action="Create" asp-controller="Seat" asp-route-airplaneName="@Model.AirplaneName" asp-route-segmentName="@segment.SegmentName">Add Seat</a>
                     }
                 </td>
             </tr>
@@ -72,7 +73,7 @@
     <a id="updateSeat"></a>
 </div>
 
-<div id="container" style="width:1000px; height:500px; margin: auto; padding: 0; overflow: hidden;"></div>
+<div id="container" style="width:1000px; height:500px; margin: auto; padding-top: 50px; overflow: hidden"></div>
 
 <div>
     <a asp-action="Details" asp-controller="Airline" asp-route-id="@Model.Airline.AirlineName">Back to List</a>
@@ -147,8 +148,8 @@
                 @if (isAdmin)
                 {
                     <text>
-                        document.getElementById('deleteSeat').outerHTML = '<a href="/Seat/Delete/@Html.Raw(seat.SeatName)" id="deleteSeat">Delete | </a>';
-                        document.getElementById('updateSeat').outerHTML = '<a href="/Seat/Edit/@Html.Raw(seat.SeatName)" id="updateSeat">Edit</a>';
+                        document.getElementById('deleteSeat').outerHTML = '<a href="/Seat/Delete/@Html.Raw(seat.AirplaneName)/@Html.Raw(seat.SegmentName)/@Html.Raw(seat.SeatName)" id="deleteSeat">Delete | </a>';
+                        document.getElementById('updateSeat').outerHTML = '<a href="/Seat/Edit/@Html.Raw(seat.AirplaneName)/@Html.Raw(seat.SegmentName)/@Html.Raw(seat.SeatName)" id="updateSeat">Edit</a>';
                     </text>
                 }
             }

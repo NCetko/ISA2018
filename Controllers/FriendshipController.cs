@@ -95,7 +95,7 @@ namespace ISA.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Sent));
             }
-            ViewData["ReceiverId"] = new SelectList(_context.Users, "Id", "UserName");
+            //ViewData["ReceiverId"] = new SelectList(_context.Users, "Id", "UserName");
             return View(friendship);
 
         }

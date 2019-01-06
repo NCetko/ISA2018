@@ -14,4 +14,18 @@
     <None Include="wwwroot\lib\konva.min.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Airline\Components\Destinations\Default.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Airline\Components\Flights\Default.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+    <Folder Include="Views\Airplane\Components\" />
+  </ItemGroup>
+
 </Project>

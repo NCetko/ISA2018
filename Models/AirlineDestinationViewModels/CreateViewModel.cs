@@ -4,23 +4,18 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ISA.Models.AirlineViewModels
+namespace ISA.Models.AirlineDestinationViewModels
 {
     public class CreateViewModel
     {
         [StringLength(100)]
-        [Display(Name = "Name")]
+        [Display(Name = "Airline Name")]
         public string AirlineName { get; set; }
 
-        [Required(ErrorMessage = "Required")]
+
         [StringLength(100)]
-        public string Address { get; set; }
-
-        [Required(ErrorMessage = "Required")]
-        [StringLength(500)]
-        public string Description { get; set; }
-
-        public IFormFile Image { get; set; }
+        [Display(Name = "Destination Name")]
+        public string DestinationName { get; set; }
 
         public CreateViewModel() { }
 

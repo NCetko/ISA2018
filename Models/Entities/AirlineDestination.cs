@@ -8,9 +8,13 @@ namespace ISA.Models.Entities
     {
         public AirlineDestination() { }
 
+        [Display(Name = "Airline Name")]
         public string AirlineName { get; set; }
-
+        
+        [Display(Name = "Destination Name")]
         public string DestinationName { get; set; }
+
+        public bool Removed { get; set; }
 
         [ForeignKey("AirlineName")]
         public Airline Airline { get; set; }

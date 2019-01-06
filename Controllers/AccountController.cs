@@ -165,10 +165,13 @@ namespace ISA.Controllers
             user.PhoneNumber = userEdit.PhoneNumber;
             user.Address = userEdit.Address;
 
-            using (var memoryStream = new MemoryStream())
+            if (userEdit.NewImage != null)
             {
-                await userEdit.NewImage.CopyToAsync(memoryStream);
-                user.Image = memoryStream.ToArray();
+                using (var memoryStream = new MemoryStream())
+                {
+                    await userEdit.NewImage.CopyToAsync(memoryStream);
+                    user.Image = memoryStream.ToArray();
+                }
             }
 
             if (ModelState.IsValid)
@@ -225,7 +228,7 @@ namespace ISA.Controllers
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 ApplicationUser user = await _userManager.GetUserAsync(HttpContext.User);
                 //bool result = await _userManager.CheckPasswordAsync(user, model.OldPassword);
-                var result = await _userManager.ChangePasswordAsync(user,model.OldPassword, model.Password);
+                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.Password);
                 if (result.Succeeded)
                 {
                     return RedirectToAction(nameof(Edit));

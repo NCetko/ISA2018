@@ -1,0 +1,33 @@
+﻿@model ISA.Models.Entities.AirlineDestination
+
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Remove destination</h2>
+
+<h3>Are you sure you want to remove this destination?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.AirlineName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Airline.AirlineName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DestinationName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Destination.DestinationName)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="AirlineName" />
+        <input type="hidden" asp-for="DestinationName" />
+        <input type="submit" value="Remove" class="btn btn-default" />
+    </form>
+</div>

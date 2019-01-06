@@ -1,0 +1,75 @@
+﻿@model IEnumerable<ISA.Models.Entities.Flight>
+@using ISA.Models.Entities
+@inject ApplicationDbContext Context
+@inject UserManager<ApplicationUser> UserManager
+
+<hr />
+<h4>Flights</h4>
+@{
+    var userId = "";
+
+    Provider provider = ViewBag.Provider;
+
+    if (User.Identity.IsAuthenticated)
+    {
+        userId = (await UserManager.GetUserAsync(User)).Id;
+
+        if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == provider)) || User.IsInRole("SysAdmin")))
+        {
+            <p>
+                <a asp-controller="Flight" asp-action="Create" asp-route-airlineName=@ViewBag.AirplaneName>Create Flight</a>
+            </p>
+        }
+    }
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                "Flight Name"
+            </th>
+            <th>
+                "Origin"
+            </th>
+            <th>
+                "Destination"
+            </th>
+            <th>
+                "Departure time"
+            </th>
+            <th>
+                "Arrival time"
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FlightName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DepartureLocation.DestinationName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ArrivalLocation.DestinationName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Departure)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Arrival)
+            </td>
+            <td>
+                @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == provider)) || User.IsInRole("SysAdmin")))
+                {
+                    <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.FlightName"> Details </a> <span> | </span>
+                    <a asp-controller="Flight" asp-action="Delete" asp-route-id="@item.FlightName"> Delete </a>
+                }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

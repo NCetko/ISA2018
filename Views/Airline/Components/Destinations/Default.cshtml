@@ -1,0 +1,48 @@
+﻿@model IEnumerable<ISA.Models.Entities.AirlineDestination>
+@using ISA.Models.Entities
+@inject ApplicationDbContext Context
+@inject UserManager<ApplicationUser> UserManager
+
+<hr />
+<h4>Destinations</h4>
+@{
+    var userId = "";
+
+    if (User.Identity.IsAuthenticated)
+    {
+        userId = (await UserManager.GetUserAsync(User)).Id;
+
+        if (User.Identity.IsAuthenticated && Model.First() != null && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == Model.First().Airline.Provider)) || User.IsInRole("SysAdmin")))
+        {
+            <p>
+                <a asp-controller="AirlineDestination" asp-action="Create" asp-route-id=@ViewBag.AirlineName>Add Destination</a>
+            </p>
+        }
+    }
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DestinationName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DestinationName)
+                </td>
+                <td>
+                    @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == item.Airline.Provider)) || User.IsInRole("SysAdmin")))
+                    {
+                        <a asp-controller = "AirlineDestination" asp-action = "Delete" asp-route-airlineName=@ViewBag.AirlineName asp-route-destinationName = "@item.DestinationName" > Remove </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

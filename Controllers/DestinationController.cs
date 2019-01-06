@@ -7,29 +7,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ISA.Data;
 using ISA.Models.Entities;
-using Microsoft.AspNetCore.Authorization;
-using ISA.Models.AirlineViewModels;
-using System.IO;
 
 namespace ISA.Controllers
 {
-    [AllowAnonymous]
-    public class AirlineController : Controller
+    public class DestinationController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public AirlineController(ApplicationDbContext context)
+        public DestinationController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: Airline
+        // GET: Destination
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Airlines.Include(a => a.Provider).ToListAsync());
+            return View(await _context.Destinations.ToListAsync());
         }
 
-        // GET: Airline/Details/5
+        // GET: Destination/Details/5
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -37,55 +33,39 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airline = await _context.Airlines
-                .Include(a => a.Provider).FirstOrDefaultAsync(m => m.AirlineName == id);
-            if (airline == null)
+            var destination = await _context.Destinations
+                .FirstOrDefaultAsync(m => m.DestinationName == id);
+            if (destination == null)
             {
                 return NotFound();
             }
 
-            return View(airline);
+            return View(destination);
         }
 
-        // GET: Airline/Create
+        // GET: Destination/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Airline/Create
+        // POST: Destination/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateViewModel viewModel)
+        public async Task<IActionResult> Create([Bind("DestinationName,Address")] Destination destination)
         {
-            Airline airline = new Airline
-            {
-                AirlineName = viewModel.AirlineName,
-                Address = viewModel.Address,
-                Description = viewModel.Description
-            };
-
-            if (viewModel.Image != null)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await viewModel.Image.CopyToAsync(memoryStream);
-                    airline.Image = memoryStream.ToArray();
-                }
-            }
-
             if (ModelState.IsValid)
             {
-                _context.Add(airline);
+                _context.Add(destination);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(airline);
+            return View(destination);
         }
 
-        // GET: Airline/Edit/5
+        // GET: Destination/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
@@ -93,49 +73,36 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airline = await _context.Airlines.FindAsync(id);
-            if (airline == null)
+            var destination = await _context.Destinations.FindAsync(id);
+            if (destination == null)
             {
                 return NotFound();
             }
-            return View(new EditViewModel(airline));
+            return View(destination);
         }
 
-        // POST: Airline/Edit
+        // POST: Destination/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(EditViewModel viewModel)
+        public async Task<IActionResult> Edit(string id, [Bind("DestinationName,Address")] Destination destination)
         {
-            Airline airline = _context.Airlines.Find(viewModel.AirlineName);
-            if (airline == null)
+            if (id != destination.DestinationName)
             {
                 return NotFound();
-            }
-
-            airline.Address = viewModel.Address;
-            airline.Description = viewModel.Description;
-
-            if (viewModel.NewImage != null)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await viewModel.NewImage.CopyToAsync(memoryStream);
-                    airline.Image = memoryStream.ToArray();
-                }
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(airline);
+                    _context.Update(destination);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AirlineExists(airline.AirlineName))
+                    if (!DestinationExists(destination.DestinationName))
                     {
                         return NotFound();
                     }
@@ -146,10 +113,10 @@ namespace ISA.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(airline);
+            return View(destination);
         }
 
-        // GET: Airline/Delete/5
+        // GET: Destination/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
@@ -157,30 +124,30 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
-            var airline = await _context.Airlines
-                .FirstOrDefaultAsync(m => m.AirlineName == id);
-            if (airline == null)
+            var destination = await _context.Destinations
+                .FirstOrDefaultAsync(m => m.DestinationName == id);
+            if (destination == null)
             {
                 return NotFound();
             }
 
-            return View(airline);
+            return View(destination);
         }
 
-        // POST: Airline/Delete/5
+        // POST: Destination/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var airline = await _context.Airlines.FindAsync(id);
-            _context.Airlines.Remove(airline);
+            var destination = await _context.Destinations.FindAsync(id);
+            _context.Destinations.Remove(destination);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool AirlineExists(string id)
+        private bool DestinationExists(string id)
         {
-            return _context.Airlines.Any(e => e.AirlineName == id);
+            return _context.Destinations.Any(e => e.DestinationName == id);
         }
     }
 }

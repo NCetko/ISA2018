@@ -8,6 +8,8 @@ namespace ISA.Models.Entities
     public class Destination
     {
         public Destination() { }
+        
+        public bool Removed { get; set; }
 
         [Key]
         [StringLength(100)]

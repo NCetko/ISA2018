@@ -9,13 +9,27 @@ namespace ISA.Models.Entities
     {
         public SeatReservation() { }
 
-        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SeatReservationId { get; set; }
 
         [Required(ErrorMessage = "Required")]
+        public string SeatName { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        public string SegmentName { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        public string AirplaneName { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        public string FlightName { get; set; }
+
+        [Required(ErrorMessage = "Required")]
+        [ForeignKey("SeatName, AirplaneName, SegmentName")]
         public Seat Seat { get; set; }
 
         [Required(ErrorMessage = "Required")]
+        [ForeignKey("FlightName")]
         public Flight Flight { get; set; }
 
         [Required(ErrorMessage = "Required")]

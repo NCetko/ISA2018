@@ -25,6 +25,8 @@ namespace ISA.Models.Entities
         [Required(ErrorMessage = "Required")]
         public int Y { get; set; }
 
+        public SeatDiscount SeatDiscount { get; set; }
+        public SeatReservation SeatReservation { get; set; }
     }
 
 }

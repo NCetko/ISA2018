@@ -21,13 +21,13 @@ namespace ISA.Data
         public DbSet<Airplane> Airplanes { get; set; }
 
         public DbSet<Destination> Destinations { get; set; }
-        
+
         public DbSet<Flight> Flights { get; set; }
-        
+
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<HotelService> HotelServices { get; set; }
-        
+
         public DbSet<HotelServiceReservation> HotelServiceReservations { get; set; }
 
         public DbSet<PointConfiguration> PointConfigurations { get; set; }
@@ -40,13 +40,13 @@ namespace ISA.Data
         public DbSet<Rating> Ratings { get; set; }
 
         public DbSet<Reservation> Reservations { get; set; }
-        
+
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomDiscount> RoomDiscounts { get; set; }
         public DbSet<RoomPrice> RoomPrices { get; set; }
         public DbSet<RoomReservation> RoomReservations { get; set; }
 
-        
+
         public DbSet<Seat> Seats { get; set; }
         public DbSet<SeatDiscount> SeatDiscounts { get; set; }
         public DbSet<SeatReservation> SeatReservations { get; set; }
@@ -56,11 +56,11 @@ namespace ISA.Data
         public DbSet<VehicleDiscount> VehicleDiscounts { get; set; }
         public DbSet<VehicleReservation> VehicleReservations { get; set; }
 
-        
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Room>().HasKey(a => new { a.HotelName, a.RoomName });
-            builder.Entity<HotelService>().HasKey(a => new { a.HotelName, a.HotelServiceType});
+            builder.Entity<HotelService>().HasKey(a => new { a.HotelName, a.HotelServiceType });
             builder.Entity<Segment>().HasKey(a => new { a.AirplaneName, a.SegmentName });
             builder.Entity<Seat>().HasKey(a => new { a.AirplaneName, a.SegmentName, a.SeatName });
             builder.Entity<AirlineDestination>().HasKey(a => new { a.AirlineName, a.DestinationName });
@@ -68,6 +68,32 @@ namespace ISA.Data
             builder.Entity<RACOffice>().HasKey(a => new { a.RACName, a.Address });
             builder.Entity<Friendship>().HasKey(a => new { a.SenderId, a.ReceiverId });
             builder.Entity<Administration>().HasKey(a => new { a.ApplicationUserId, a.ProviderId });
+            builder.Entity<SeatDiscount>().HasKey(a => new { a.FlightName, a.AirplaneName, a.SegmentName, a.SeatName });
+            builder.Entity<SeatReservation>().HasKey(a => new { a.FlightName, a.AirplaneName, a.SegmentName, a.SeatName });
+
+            builder.Entity<SeatDiscount>().HasAlternateKey(a => new { a.DiscountId });
+            builder.Entity<SeatReservation>().HasAlternateKey(a => new { a.SeatReservationId });
+
+            builder.Entity<SeatReservation>()
+            .HasOne(m => m.Seat)
+            .WithOne(t => t.SeatReservation)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SeatReservation>()
+            .HasOne(m => m.Flight)
+            .WithMany(t => t.SeatReservations)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SeatDiscount>()
+            .HasOne(m => m.Seat)
+            .WithOne(t => t.SeatDiscount)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SeatDiscount>()
+            .HasOne(m => m.Flight)
+            .WithMany(t => t.SeatDiscounts)
+            .OnDelete(DeleteBehavior.Restrict);
+
 
             builder.Entity<Rating>()
             .HasOne(m => m.Reservation)
@@ -83,7 +109,7 @@ namespace ISA.Data
             .HasOne(m => m.Receiver)
             .WithMany(t => t.ReceivedRequests)
             .OnDelete(DeleteBehavior.Restrict);
-            
+
             builder.Entity<Flight>()
             .HasOne(m => m.DepartureLocation)
             .WithMany(t => t.Departures)
@@ -93,7 +119,7 @@ namespace ISA.Data
             .HasOne(m => m.ArrivalLocation)
             .WithMany(t => t.Arrivals)
             .OnDelete(DeleteBehavior.Restrict);
-            
+
             base.OnModelCreating(builder);
         }
     }

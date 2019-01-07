@@ -17,7 +17,7 @@
         if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == provider)) || User.IsInRole("SysAdmin")))
         {
             <p>
-                <a asp-controller="Flight" asp-action="Create" asp-route-airlineName=@ViewBag.AirplaneName>Create Flight</a>
+                <a asp-controller="Flight" asp-action="Create" asp-route-airlineName=@ViewBag.AirlineName>Create Flight</a>
             </p>
         }
     }

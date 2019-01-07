@@ -1,30 +1,24 @@
-﻿using System;
+﻿using ISA.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ISA.Models.Entities
+namespace ISA.Models.FlightViewModels
 {
-    public class Flight
+    public class CreateViewModel
     {
-        public Flight() {
-            Ratable = new Ratable();
-        }
+        [Display(Name = "Flight Name")]
+        public string FlightName { get; set; }
 
         [Required(ErrorMessage = "Required")]
-        [Column(TypeName = "datetime")]
         public DateTime Departure { get; set; }
 
         [Required(ErrorMessage = "Required")]
-        [Column(TypeName = "datetime")]
         public DateTime Arrival { get; set; }
 
-        [Key]
-        [Display(Name = "Name")]
-        public string FlightName { get; set; }
-
         [Display(Name = "Preceding Flight")]
-        public Flight PrecedingFlight { get; set; }
+        public string PrecedingFlightName { get; set; }
 
         [Required(ErrorMessage = "Required")]
         [Range(1, int.MaxValue)]
@@ -43,12 +37,13 @@ namespace ISA.Models.Entities
         public int CheckedBag { get; set; }
 
         [Required(ErrorMessage = "Required")]
-        [Display(Name = "Departure Location")]
-        public AirlineDestination DepartureLocation { get; set; }
+        [Display(Name = "Origin")]
+        public string DepartureLocationName { get; set; }
 
         [Required(ErrorMessage = "Required")]
-        [Display(Name = "Arrival Location")]
-        public AirlineDestination ArrivalLocation { get; set; }
+        [Display(Name = "Destination")]
+        public string ArrivalLocationName { get; set; }
+
 
         [Display(Name = "Baggage Details")]
         public string BaggageDetails { get; set; }
@@ -56,12 +51,11 @@ namespace ISA.Models.Entities
         public string Services { get; set; }
 
         [Required(ErrorMessage = "Required")]
-        public Airplane Airplane { get; set; }
+        [Display(Name = "Airplane Name")]
+        public string AirplaneName { get; set; }
 
-        public Ratable Ratable { get; set; }
-
-        public ICollection<SeatDiscount> SeatDiscounts { get; set; }
-        public ICollection<SeatReservation> SeatReservations { get; set; }
+        [Required(ErrorMessage = "Required")]
+        [Display(Name = "Airline Name")]
+        public string AirlineName { get; set; }
     }
-
 }

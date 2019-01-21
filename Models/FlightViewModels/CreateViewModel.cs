@@ -17,9 +17,6 @@ namespace ISA.Models.FlightViewModels
         [Required(ErrorMessage = "Required")]
         public DateTime Arrival { get; set; }
 
-        [Display(Name = "Preceding Flight")]
-        public string PrecedingFlightName { get; set; }
-
         [Required(ErrorMessage = "Required")]
         [Range(1, int.MaxValue)]
         public int Price { get; set; }
@@ -36,7 +33,6 @@ namespace ISA.Models.FlightViewModels
         [Display(Name = "Checked Bag")]
         public int CheckedBag { get; set; }
 
-        [Required(ErrorMessage = "Required")]
         [Display(Name = "Origin")]
         public string DepartureLocationName { get; set; }
 

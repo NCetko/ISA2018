@@ -1,4 +1,4 @@
-﻿@model ISA.Models.Entities.Flight
+﻿@model ISA.Models.FlightViewModels.CreateViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,7 +12,34 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
+            <input type="hidden" asp-for="AirlineName" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FlightName" class="control-label"></label>
+                <input asp-for="FlightName" class="form-control" />
+                <span disabled asp-validation-for="FlightName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AirplaneName" class="control-label"></label>
+                <select asp-for="AirplaneName" class="form-control" asp-items="@ViewBag.Airplanes">
+                    <option selected value="">--Select Airplane--</option>
+                </select>
+                <span asp-validation-for="AirplaneName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DepartureLocationName" class="control-label"></label>
+                <select asp-for="DepartureLocationName" class="form-control" asp-items="@ViewBag.Destinations" data-val="true" data-val-required="Required">
+                    <option selected value="">--Select origin--</option>
+                </select>
+                <span asp-validation-for="DepartureLocationName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ArrivalLocationName" class="control-label"></label>
+                <select asp-for="ArrivalLocationName" class="form-control" asp-items="@ViewBag.Destinations">
+                    <option selected value="">--Select destination--</option>
+                </select>
+                <span asp-validation-for="ArrivalLocationName" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Departure" class="control-label"></label>
                 <input asp-for="Departure" class="form-control" />
@@ -23,7 +50,6 @@
                 <input asp-for="Arrival" class="form-control" />
                 <span asp-validation-for="Arrival" class="text-danger"></span>
             </div>
-            <input type="hidden" asp-for="FlightName" />
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" />

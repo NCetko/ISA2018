@@ -23,9 +23,6 @@ namespace ISA.Models.Entities
         [Display(Name = "Name")]
         public string FlightName { get; set; }
 
-        [Display(Name = "Preceding Flight")]
-        public Flight PrecedingFlight { get; set; }
-
         [Required(ErrorMessage = "Required")]
         [Range(1, int.MaxValue)]
         public int Price { get; set; }

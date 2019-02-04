@@ -53,9 +53,13 @@
             }
         </dd>
     </dl>
+    @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == Model.Provider)) || User.IsInRole("SysAdmin")))
+    {
     @await Component.InvokeAsync("Destinations", new { airlineName = Model.AirlineName })
     @await Component.InvokeAsync("Airplanes", new { airlineName = Model.AirlineName })
+    }
     @await Component.InvokeAsync("Flights", new { airlineName = Model.AirlineName })
+    @await Component.InvokeAsync("SeatDiscounts", new { airlineName = Model.AirlineName })
 </div>
 <div>
     @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == Model.Provider)) || User.IsInRole("SysAdmin")))

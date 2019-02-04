@@ -18,6 +18,9 @@
     <Content Update="Views\Airline\Components\Destinations\Default.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Airline\Components\SeatDiscounts\Default.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Airline\Components\Flights\Default.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

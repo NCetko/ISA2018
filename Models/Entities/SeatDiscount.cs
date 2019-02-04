@@ -38,7 +38,7 @@ namespace ISA.Models.Entities
 
         public string Passport { get; set; }
 
-        public  Reservation Reservation { get; set; }
+        public Reservation Reservation { get; set; }
 
     }
 

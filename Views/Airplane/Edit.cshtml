@@ -21,10 +21,6 @@
     </div>
 </div>
 
-<div>
-    <a asp-action="Details" asp-controller="Airline" asp-route-id="@Model.Airline.AirlineName">Back to List</a>
-</div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

@@ -89,8 +89,7 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.FlightName">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.FlightName">Edit</a>
 </div>
 
 <div style="height:3px">
@@ -107,10 +106,6 @@
 </div>
 
 <div id="container" style="width:1000px; height:500px; margin: auto; padding-top: 50px; overflow: hidden"></div>
-
-<div>
-    <a asp-action="Details" asp-controller="Airline" asp-route-id="@Model.Airplane.Airline.AirlineName">Back to List</a>
-</div>
 
 <script>
     var stage = new Konva.Stage({

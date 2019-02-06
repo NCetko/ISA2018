@@ -25,8 +25,7 @@ namespace ISA.Controllers
         // GET: SeatDiscount
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.SeatDiscounts.Include(s => s.Flight).Include(s => s.Seat);
-            return View(await applicationDbContext.ToListAsync());
+            return NotFound();
         }
 
         // POST: SeatDiscount/Create
@@ -54,7 +53,7 @@ namespace ISA.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Details", "Airline", new { id = seatDiscount.Flight.Airplane.Airline.AirlineName });
             }
-            return RedirectToAction("Details", "Airline", new { id = seatDiscount.Flight.Airplane.Airline.AirlineName });
+            return Forbid();
         }
 
         [HttpPost]

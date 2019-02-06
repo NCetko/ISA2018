@@ -48,10 +48,6 @@
     })
 </script>
 
-<div>
-    <a asp-action="Details" asp-controller="Airplane" asp-route-id="@ViewBag.AirplaneName">Back to List</a>
-</div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

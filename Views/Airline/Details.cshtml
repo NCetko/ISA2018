@@ -64,7 +64,6 @@
 <div>
     @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == Model.Provider)) || User.IsInRole("SysAdmin")))
     {
-        <a asp-action="Edit" asp-route-id="@Model.AirlineName">Edit</a> <span> | </span>
+        <a asp-action="Edit" asp-route-id="@Model.AirlineName">Edit</a>
     }
-    <a asp-action="Index">Back to List</a>
 </div>

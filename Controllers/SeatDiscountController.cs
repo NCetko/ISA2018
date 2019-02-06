@@ -35,19 +35,26 @@ namespace ISA.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(int price, string flightName, string seatName, string airplaneName, string segmentName)
         {
+            Flight flight = await _context.Flights.FindAsync(flightName);
+            if (flight == null)
+            {
+                return NotFound();
+            }
+            _context.Entry(flight).Reference(f => f.Airplane).Load();
+            _context.Entry(flight.Airplane).Reference(f => f.Airline).Load();
             SeatDiscount seatDiscount = new SeatDiscount
             {
                 Seat = await _context.Seats.FindAsync(airplaneName, segmentName, seatName),
                 Price = price,
-                Flight = await _context.Flights.FindAsync(flightName)
+                Flight = flight
             };
             if (ModelState.IsValid)
             {
                 _context.Add(seatDiscount);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Details", "Airline", new { id = seatDiscount.Flight.Airplane.Airline.AirlineName });
             }
-            return View(seatDiscount);
+            return RedirectToAction("Details", "Airline", new { id = seatDiscount.Flight.Airplane.Airline.AirlineName });
         }
 
         [HttpPost]

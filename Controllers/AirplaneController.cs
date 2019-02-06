@@ -47,8 +47,17 @@ namespace ISA.Controllers
                 return NotFound();
             }
 
+            var seats = _context.Seats.Where(s => s.AirplaneName == id);
+            var reservedSeats = await (
+                from s in _context.Seats
+                where _context.SeatReservations.Any(sr => sr.Seat == s && sr.Flight.Departure < DateTime.Now)
+                || _context.SeatDiscounts.Any(sr => sr.Seat == s && sr.Flight.Departure < DateTime.Now)
+                select s
+                ).ToListAsync();
+
             ViewBag.Segments = _context.Segments.Where(s => s.AirplaneName == id);
-            ViewBag.Seats = _context.Seats.Where(s => s.AirplaneName == id);
+            ViewBag.Seats = seats;
+            ViewBag.ReservedSeats = reservedSeats;
 
             return View(airplane);
         }

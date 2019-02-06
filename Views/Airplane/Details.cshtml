@@ -71,6 +71,8 @@
     <p id="seatInfo">Select a seat: </p>
     <a id="deleteSeat"></a>
     <a id="updateSeat"></a>
+    <p id="reserved" style="display:none">A reservation excists.</p>
+
 </div>
 
 <div id="container" style="width:1000px; height:500px; margin: auto; padding-top: 50px; overflow: hidden"></div>
@@ -147,23 +149,36 @@
                 this.fill('#FFFFFF');
                 @if (isAdmin)
                 {
-                    <text>
-                        document.getElementById('deleteSeat').outerHTML = '<a href="/Seat/Delete/@Html.Raw(seat.AirplaneName)/@Html.Raw(seat.SegmentName)/@Html.Raw(seat.SeatName)" id="deleteSeat">Delete | </a>';
-                        document.getElementById('updateSeat').outerHTML = '<a href="/Seat/Edit/@Html.Raw(seat.AirplaneName)/@Html.Raw(seat.SegmentName)/@Html.Raw(seat.SeatName)" id="updateSeat">Edit</a>';
-                    </text>
+                    @if (ViewBag.ReservedSeats.Contains(seat))
+                    {
+                        <text>
+                            document.getElementById('reserved').style.display = "block";
+                            document.getElementById('deleteSeat').textContent = '';
+                            document.getElementById('updateSeat').textContent = '';
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                            document.getElementById('reserved').style.display = "none";
+                            document.getElementById('deleteSeat').outerHTML = '<a href="/Seat/Delete/@Html.Raw(seat.AirplaneName)/@Html.Raw(seat.SegmentName)/@Html.Raw(seat.SeatName)" id="deleteSeat">Delete | </a>';
+                            document.getElementById('updateSeat').outerHTML = '<a href="/Seat/Edit/@Html.Raw(seat.AirplaneName)/@Html.Raw(seat.SegmentName)/@Html.Raw(seat.SeatName)" id="updateSeat">Edit</a>';
+                        </text>
+                    }
                 }
-            }
+                }
             else
             {
-                this.fill(segments['@Html.Raw(seat.SegmentName)']);
-                document.getElementById('seatInfo').textContent = 'Select a seat:';
-                selected = new String('0');
+                    this.fill(segments['@Html.Raw(seat.SegmentName)']);
+                    document.getElementById('seatInfo').textContent = 'Select a seat:';
+                    selected = new String('0');
 
                 @if (isAdmin)
                 {
                     <text>
                         document.getElementById('deleteSeat').textContent = '';
                         document.getElementById('updateSeat').textContent = '';
+                        document.getElementById('reserved').style.display = "none";
                     </text>
                 }
             }

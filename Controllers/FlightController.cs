@@ -37,10 +37,31 @@ namespace ISA.Controllers
 
             var flight = await _context.Flights
                 .FirstOrDefaultAsync(m => m.FlightName == id);
+
+            await _context.Entry(flight).Reference(f => f.DepartureLocation).LoadAsync();
+            await _context.Entry(flight.DepartureLocation).Reference(f => f.Destination).LoadAsync();
+            await _context.Entry(flight).Reference(f => f.ArrivalLocation).LoadAsync();
+            await _context.Entry(flight.ArrivalLocation).Reference(f => f.Destination).LoadAsync();
+            await _context.Entry(flight).Reference(f => f.Airplane).LoadAsync();
+            await _context.Entry(flight.Airplane).Reference(f => f.Airline).LoadAsync();
             if (flight == null)
             {
                 return NotFound();
             }
+
+            var seats = _context.Seats.Where(s => s.AirplaneName == flight.Airplane.AirplaneName);
+
+            var reservedSeats = await (
+                from s in _context.Seats
+                where _context.SeatReservations.Any(sr => sr.Seat == s && sr.Flight.Departure < DateTime.Now)
+                || _context.SeatDiscounts.Any(sr => sr.Seat == s && sr.Flight.Departure < DateTime.Now)
+                select s
+                ).ToListAsync();
+
+            ViewBag.ReservedSeats = reservedSeats;
+
+            ViewBag.Segments = _context.Segments.Where(s => s.AirplaneName == flight.Airplane.AirplaneName);
+            ViewBag.Seats = seats;
 
             return View(flight);
         }

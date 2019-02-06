@@ -1,4 +1,9 @@
 ﻿@model ISA.Models.Entities.Flight
+@using ISA.Models.Entities
+@inject ApplicationDbContext Context
+@inject UserManager<ApplicationUser> UserManager
+
+<script src="@Url.Content("~/lib/konva.min.js")"></script>
 
 @{
     ViewData["Title"] = "Details";
@@ -6,11 +11,33 @@
 }
 
 <h2>Details</h2>
+@{
+    var userId = "";
+    var isAdmin = false;
+    if (User.Identity.IsAuthenticated)
+    {
+        userId = (await UserManager.GetUserAsync(User)).Id;
+        isAdmin = (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == Model.Airplane.Airline.Provider)) || User.IsInRole("SysAdmin")));
+    }
+
+}
 
 <div>
     <h4>Flight</h4>
     <hr />
     <dl class="dl-horizontal">
+        <dt>
+            Origin
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DepartureLocation.Destination.DestinationName)
+        </dd>
+        <dt>
+            Destination
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ArrivalLocation.Destination.DestinationName)
+        </dd>
         <dt>
             @Html.DisplayNameFor(model => model.Departure)
         </dt>
@@ -65,3 +92,136 @@
     <a asp-action="Edit" asp-route-id="@Model.FlightName">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+<div style="height:3px">
+    <p id="seatInfo">Select a seat: </p>
+    <form asp-controller="SeatDiscount" style="display:none" asp-action="Create" id="discountForm">
+        <input type="hidden" id="flightName" name="flightName" value="@Model.FlightName" />
+        <input type="hidden" id="airplaneName" name="airplaneName" value="@Model.Airplane.AirplaneName" />
+        <input type="hidden" id="segmentName" name="segmentName" />
+        <input type="hidden" id="seatName" name="seatName" />
+        <input type="number" id="price" name="price" value="50" />
+        <input type="submit" value="Add Discount" class="btn btn-default" />
+    </form>
+    <p id="reserved" style="display:none">A reservation excists.</p>
+</div>
+
+<div id="container" style="width:1000px; height:500px; margin: auto; padding-top: 50px; overflow: hidden"></div>
+
+<div>
+    <a asp-action="Details" asp-controller="Airline" asp-route-id="@Model.Airplane.Airline.AirlineName">Back to List</a>
+</div>
+
+<script>
+    var stage = new Konva.Stage({
+        container: 'container',
+        width: 1000,
+        height: 500
+    });
+
+    var layer = new Konva.Layer();
+
+    var selected = new String('0');
+    var prevColor = 'black';
+    var segments = [];
+</script>
+
+@foreach (var segment in ViewBag.Segments)
+{
+    <script>
+            segments['@Html.Raw(segment.SegmentName)']='@Html.Raw(segment.Color)'
+    </script>
+}
+
+@foreach (var seat in ViewBag.Seats)
+{
+    <script>
+        var scale = 2;
+        var seat = new Konva.Shape({
+            sceneFunc: function (context, shape) {
+            context.beginPath();
+                context.moveTo(@Html.Raw(seat.X)-10 * scale, @Html.Raw(seat.Y)-9 * scale);
+                context.lineTo(@Html.Raw(seat.X)-5 * scale, @Html.Raw(seat.Y)+8 * scale);
+                context.lineTo(@Html.Raw(seat.X)+7.5 * scale, @Html.Raw(seat.Y)+8 * scale);
+                context.quadraticCurveTo(@Html.Raw(seat.X)+12 * scale, @Html.Raw(seat.Y)+1 * scale,
+                    @Html.Raw(seat.X)+8 * scale, @Html.Raw(seat.Y) + 0 * scale);
+                context.lineTo(@Html.Raw(seat.X)+ 0 * scale, @Html.Raw(seat.Y)+0.5 * scale);
+                context.lineTo(@Html.Raw(seat.X)-3 * scale, @Html.Raw(seat.Y)-8 * scale);
+                context.quadraticCurveTo(@Html.Raw(seat.X)-4 * scale, @Html.Raw(seat.Y)-10 * scale,
+                    @Html.Raw(seat.X)-10 * scale, @Html.Raw(seat.Y)-9 * scale);
+            context.closePath();
+
+            // (!) Konva specific method, it is very important
+            context.fillStrokeShape(shape);
+        },
+        radius: 10,
+        fill:segments['@Html.Raw(seat.SegmentName)'],
+        stroke: 'black',
+        strokeWidth: 1,
+        draggable: false,
+        id: '@Html.Raw(seat.SeatName)'
+        });
+
+    // add the shape to the layer
+        layer.add(seat);
+
+        seat.on('click', function ()
+        {
+            if (this.fill() === segments['@Html.Raw(seat.SegmentName)'])
+            {
+                if (selected != '0')
+                {
+                    var shape = stage.findOne(selected);
+                    shape.fill(prevColor);
+                }
+                selected = '#' + this.id();
+                prevColor = this.fill();
+                document.getElementById('seatInfo').textContent = 'Seat: @Html.Raw(seat.SeatName)';
+                this.fill('#FFFFFF');
+                @if (isAdmin)
+                {
+                    @if (ViewBag.ReservedSeats.Contains(seat))
+                    {
+                        <text>
+                            document.getElementById('segmentName').value = '';
+                            document.getElementById('seatName').value = '';
+                            document.getElementById('discountForm').style.display="none";
+                            document.getElementById('reserved').style.display = "block";
+                        </text>
+                    }
+                    else
+                    {
+                       <text>
+                            document.getElementById('segmentName').value = '@Html.Raw(seat.SegmentName)';
+                            document.getElementById('seatName').value = '@Html.Raw(seat.SeatName)';
+                            document.getElementById('discountForm').style.display="block";
+                            document.getElementById('reserved').style.display = "none";
+                        </text>
+                    }
+                }
+            }
+            else
+            {
+                this.fill(segments['@Html.Raw(seat.SegmentName)']);
+                document.getElementById('seatInfo').textContent = 'Select a seat:';
+                selected = new String('0');
+
+                @if (isAdmin)
+                {
+                    <text>
+                        document.getElementById('segmentName').value = "";
+                        document.getElementById('seatName').value = "";
+                        document.getElementById('discountForm').style.display = "none";
+                        document.getElementById('reserved').style.display = "none";
+                    </text>
+                }
+            }
+            layer.draw();
+        });
+    </script>
+}
+<script>
+    // add the layer to the stage
+    stage.add(layer);
+</script>
+

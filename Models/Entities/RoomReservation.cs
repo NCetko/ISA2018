@@ -25,7 +25,7 @@ namespace ISA.Models.Entities
         [Required(ErrorMessage = "Required")]
         public RoomPrice RoomPrice { get; set; }
 
-        public Reservation Reservation { get; set; }
+        //public Reservation Reservation { get; set; }
     }
 
 }

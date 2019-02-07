@@ -75,7 +75,8 @@ namespace ISA.Controllers
             {
                 Created = DateTime.Now,
                 ApplicationUser = user,
-                TotalPrice = seatDiscount.Price
+                TotalPrice = seatDiscount.Price,
+                Airline = seatDiscount.Flight.Airplane.Airline
             };
 
             if (ModelState.IsValid)

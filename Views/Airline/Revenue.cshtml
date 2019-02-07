@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewData["Title"] = "Revenue";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-4">
+
+        <h2>Revenue</h2>
+        @if (ViewBag.Valid)
+        {
+            <p>Revenue between @ViewBag.StartDate and @ViewBag.EndDate: @ViewBag.Revenue</p>
+        }
+        <hr/>
+        <form asp-action="Revenue">
+            <div class="form-group">
+                <p>Start Date</p>
+                <input type="datetime" name="startDate" value="@ViewBag.StartDate" />
+            </div>
+            <p>Start Date</p>
+            <div class="form-group">
+                <input type="datetime" name="endDate" value="@ViewBag.EndDate" />
+            </div>
+            <div class="form-group">
+                <input type="hidden" name="airlineName" value="@ViewBag.AirlineName" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit" />
+            </div>
+        </form>
+
+    </div>
+</div>
+
+

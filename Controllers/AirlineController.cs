@@ -29,6 +29,49 @@ namespace ISA.Controllers
             return View(await _context.Airlines.Include(a => a.Provider).ToListAsync());
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> Revenue(string id)
+        {
+            ViewBag.StartDate = DateTime.Now;
+            ViewBag.EndDate = DateTime.Now;
+            ViewBag.Valid = false;
+            ViewBag.AirlineName = id;
+            return View();
+        }
+
+        [HttpPost("/Airline/Revenue/{id}")]
+        public async Task<IActionResult> Revenue(string id, RevenueViewModel viewModel)
+        {
+            if (viewModel.StartDate == null || viewModel.EndDate == null)
+            {
+                ViewBag.StartDate = DateTime.Now;
+                ViewBag.EndDate = DateTime.Now;
+                ViewBag.Valid = false;
+                ViewBag.AirlineName = id;
+                return View();
+            }
+            ViewBag.Valid = true;
+            double revenue;
+            try
+            {
+                revenue = await _context.Reservations
+                    .Where(r => r.Created > viewModel.StartDate && r.Created < viewModel.EndDate)
+                    .Where(r => r.Airline.AirlineName == id)
+                    .SumAsync(r => r.TotalPrice);
+
+            }
+            catch
+            {
+                revenue = 0;
+            }
+
+            ViewBag.Revenue = revenue;
+            ViewBag.StartDate = viewModel.StartDate;
+            ViewBag.EndDate = viewModel.EndDate;
+            return View();
+        }
+
         // GET: Airline/Details/5
         public async Task<IActionResult> Details(string id)
         {

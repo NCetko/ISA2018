@@ -19,13 +19,16 @@ namespace ISA.Models.Entities
         public ApplicationUser ApplicationUser { get; set; }
 
         [Required(ErrorMessage = "Required")]
+        public Airline Airline { get; set; }
+
+        [Required(ErrorMessage = "Required")]
         [Display(Name = "Total price")]
         public float TotalPrice { get; set; }
 
-        public  ICollection<RoomReservation> RoomReservations { get; set; }
+        //public  ICollection<RoomReservation> RoomReservations { get; set; }
         public  ICollection<SeatReservation> SeatReservations { get; set; }
         public  ICollection<Rating> Ratings { get; set; }
 
-        public  ICollection<VehicleReservation> VehicleReservations { get; set; }
+        //public  ICollection<VehicleReservation> VehicleReservations { get; set; }
     }
 }

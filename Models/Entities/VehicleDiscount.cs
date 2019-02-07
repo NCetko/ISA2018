@@ -19,7 +19,7 @@ namespace ISA.Models.Entities
         [Range(1, int.MaxValue)]
         public int Price { get; set; }
 
-        public  Reservation Reservation { get; set; }
+        //public  Reservation Reservation { get; set; }
 
     }
 

@@ -25,26 +25,26 @@ namespace ISA.Data
         public DbSet<Flight> Flights { get; set; }
 
         public DbSet<Friendship> Friendships { get; set; }
-        public DbSet<Hotel> Hotels { get; set; }
-        public DbSet<HotelService> HotelServices { get; set; }
+        //public DbSet<Hotel> Hotels { get; set; }
+        //public DbSet<HotelService> HotelServices { get; set; }
 
-        public DbSet<HotelServiceReservation> HotelServiceReservations { get; set; }
+        //public DbSet<HotelServiceReservation> HotelServiceReservations { get; set; }
 
         public DbSet<PointConfiguration> PointConfigurations { get; set; }
         public DbSet<Provider> Providers { get; set; }
 
-        public DbSet<RAC> RACs { get; set; }
-        public DbSet<RACOffice> RACOffices { get; set; }
+        //public DbSet<RAC> RACs { get; set; }
+        //public DbSet<RACOffice> RACOffices { get; set; }
 
         public DbSet<Ratable> Ratables { get; set; }
         public DbSet<Rating> Ratings { get; set; }
 
         public DbSet<Reservation> Reservations { get; set; }
 
-        public DbSet<Room> Rooms { get; set; }
-        public DbSet<RoomDiscount> RoomDiscounts { get; set; }
-        public DbSet<RoomPrice> RoomPrices { get; set; }
-        public DbSet<RoomReservation> RoomReservations { get; set; }
+        //public DbSet<Room> Rooms { get; set; }
+        //public DbSet<RoomDiscount> RoomDiscounts { get; set; }
+        //public DbSet<RoomPrice> RoomPrices { get; set; }
+        //public DbSet<RoomReservation> RoomReservations { get; set; }
 
 
         public DbSet<Seat> Seats { get; set; }
@@ -52,20 +52,20 @@ namespace ISA.Data
         public DbSet<SeatReservation> SeatReservations { get; set; }
         public DbSet<Segment> Segments { get; set; }
 
-        public DbSet<Vehicle> Vehicles { get; set; }
-        public DbSet<VehicleDiscount> VehicleDiscounts { get; set; }
-        public DbSet<VehicleReservation> VehicleReservations { get; set; }
+        //public DbSet<Vehicle> Vehicles { get; set; }
+        //public DbSet<VehicleDiscount> VehicleDiscounts { get; set; }
+        //public DbSet<VehicleReservation> VehicleReservations { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Room>().HasKey(a => new { a.HotelName, a.RoomName });
-            builder.Entity<HotelService>().HasKey(a => new { a.HotelName, a.HotelServiceType });
+            //builder.Entity<Room>().HasKey(a => new { a.HotelName, a.RoomName });
+            //builder.Entity<HotelService>().HasKey(a => new { a.HotelName, a.HotelServiceType });
             builder.Entity<Segment>().HasKey(a => new { a.AirplaneName, a.SegmentName });
             builder.Entity<Seat>().HasKey(a => new { a.AirplaneName, a.SegmentName, a.SeatName });
             builder.Entity<AirlineDestination>().HasKey(a => new { a.AirlineName, a.DestinationName });
-            builder.Entity<Vehicle>().HasKey(a => new { a.RACName, a.VehicleName });
-            builder.Entity<RACOffice>().HasKey(a => new { a.RACName, a.Address });
+            //builder.Entity<Vehicle>().HasKey(a => new { a.RACName, a.VehicleName });
+            //builder.Entity<RACOffice>().HasKey(a => new { a.RACName, a.Address });
             builder.Entity<Friendship>().HasKey(a => new { a.SenderId, a.ReceiverId });
             builder.Entity<Administration>().HasKey(a => new { a.ApplicationUserId, a.ProviderId });
             builder.Entity<SeatDiscount>().HasKey(a => new { a.FlightName, a.AirplaneName, a.SegmentName, a.SeatName });

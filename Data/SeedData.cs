@@ -27,8 +27,8 @@ namespace ISA.Data
                 SeedRoles(serviceProvider, Configuration).Wait();
                 SeedPointConfigurations(context);
                 SeedDestinations(context);
-                SeedHotel(context);
-                SeedRAC(context);
+                //SeedHotel(context);
+                //SeedRAC(context);
                 SeedAirline(context);
                 SeedAdmins(serviceProvider, Configuration, context).Wait();
                 SeedUsers(serviceProvider, Configuration, context).Wait();
@@ -117,6 +117,7 @@ namespace ISA.Data
             context.SaveChanges();
         }
 
+        /*
         public static void SeedHotel(ApplicationDbContext context)
         {
 
@@ -341,7 +342,7 @@ namespace ISA.Data
                 context.SaveChanges();
             }
         }
-
+        
         public static void SeedRAC(ApplicationDbContext context)
         {
             if (context.RACs.Any())
@@ -433,7 +434,7 @@ namespace ISA.Data
                 context.SaveChanges();
             }
         }
-
+        */
 
         public static void SeedAirline(ApplicationDbContext context)
         {
@@ -772,20 +773,22 @@ namespace ISA.Data
                 context.SaveChanges();
 
                 context.Administration.AddRange(
+                    /*
                     new Administration
                     {
                         ApplicationUser = context.Users.Where(t => t.UserName == "hoteladmin@mail.com").First(),
                         Provider = context.Hotels.Find("Belgrade 1").Provider
                     },
-                    new Administration
-                    {
-                        ApplicationUser = context.Users.Where(t => t.UserName == "airadmin@mail.com").First(),
-                        Provider = context.Airlines.Find("Airline 1").Provider
-                    },
+
                     new Administration
                     {
                         ApplicationUser = context.Users.Where(t => t.UserName == "racadmin@mail.com").First(),
                         Provider = context.RACs.Find("Rac Belgrade").Provider
+                    },*/
+                    new Administration
+                    {
+                        ApplicationUser = context.Users.Where(t => t.UserName == "airadmin@mail.com").First(),
+                        Provider = context.Airlines.Find("Airline 1").Provider
                     }
                 );
             }
@@ -882,7 +885,8 @@ namespace ISA.Data
                 {
                     Created = new DateTime(2016, 1, 1, 0, 0, 0),
                     ApplicationUser = context.Users.Where(t => t.UserName == "user1@mail.com").First(),
-                    TotalPrice = 50
+                    TotalPrice = 50,
+                    Airline = context.Airlines.Find("Airline 1")
                 };
 
                 context.Reservations.Add(reservation);
@@ -907,7 +911,7 @@ namespace ISA.Data
                         Ratable = seatDiscount.Flight.Ratable,
                         Reservation = reservation,
                         ApplicationUser = context.Users.Where(t => t.UserName == "user1@mail.com").First()
-                    }, 
+                    },
                     new Rating()
                     {
                         Value = 5,

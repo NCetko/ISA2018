@@ -23,7 +23,7 @@ namespace ISA.ViewComponents
             ViewBag.AirlineName = airlineName;
             if (string.IsNullOrEmpty(airlineName))
             {
-                return(null);
+                return (null);
             }
             var airline = _context.Airlines.Find(airlineName);
             _context.Entry(airline).Reference(a => a.Provider).Load();

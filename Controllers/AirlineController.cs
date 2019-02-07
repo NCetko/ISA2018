@@ -38,11 +38,22 @@ namespace ISA.Controllers
             }
 
             var airline = await _context.Airlines
-                .Include(a => a.Provider).FirstOrDefaultAsync(m => m.AirlineName == id);
+                .Include(a => a.Provider)
+                .Include(a => a.Ratable)
+                .FirstOrDefaultAsync(m => m.AirlineName == id);
             if (airline == null)
             {
                 return NotFound();
             }
+
+            try
+            {
+                var score = _context.Ratings
+                .Where(r => r.Ratable == airline.Ratable)
+                .Average(r => r.Value);
+                ViewBag.Score = score;
+            }
+            catch { }
 
             return View(airline);
         }

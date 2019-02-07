@@ -80,6 +80,15 @@ namespace ISA.Controllers
             ViewBag.Segments = _context.Segments.Where(s => s.AirplaneName == flight.Airplane.AirplaneName);
             ViewBag.Seats = seats;
 
+            try
+            {
+                var score = _context.Ratings
+                    .Where(r => r.Ratable == flight.Ratable)
+                    .Average(r => r.Value);
+                ViewBag.Score = score;
+            }
+            catch{}
+
             return View(flight);
         }
 

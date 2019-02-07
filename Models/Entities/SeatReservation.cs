@@ -35,14 +35,11 @@ namespace ISA.Models.Entities
         [Required(ErrorMessage = "Required")]
         public Reservation Reservation { get; set; }
 
-        [Required(ErrorMessage = "Required")]
         public string Passport { get; set; }
 
-        [Required(ErrorMessage = "Required")]
         [Display(Name = "First name")]
         public string FirstName { get; set; }
 
-        [Required(ErrorMessage = "Required")]
         [Display(Name = "Last name")]
         public string LastName { get; set; }
 

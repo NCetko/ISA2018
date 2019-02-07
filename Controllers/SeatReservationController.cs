@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ISA.Data;
 using ISA.Models.Entities;
 using Microsoft.AspNetCore.Identity;
+using ISA.Models.SeatReservationViewModels;
 
 namespace ISA.Controllers
 {
@@ -27,24 +28,26 @@ namespace ISA.Controllers
         // GET: SeatReservation
         public async Task<IActionResult> Index()
         {
-            return NotFound();
+            var user = _context.Users.Find((await _userManager.GetUserAsync(HttpContext.User)).Id);
+            List<SeatReservation> seatReservations = await _context.SeatReservations.Where(s=>s.ApplicationUser == user).ToListAsync();
+            return View(seatReservations);
         }
 
         // POST: SeatReservation/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public async Task<IActionResult> Create(string passport, string firstName, string lastName, string flightName, string seatName, string segmentName)
+        public async Task<IActionResult> Create(CreateViewModel viewModel)
         {
             var user = _context.Users.Find((await _userManager.GetUserAsync(HttpContext.User)).Id);
-            Flight flight = _context.Flights.Find(flightName);
+            Flight flight = _context.Flights.Find(viewModel.FlightName);
             _context.Entry(flight).Reference(f=>f.Airplane).Load();
             _context.Entry(flight.Airplane).Reference(f=>f.Airline).Load();
 
             if (flight == null) {
                 return NotFound();
             };
-            Seat seat = _context.Seats.Find(flight.Airplane.AirplaneName, segmentName, seatName);
+            Seat seat = _context.Seats.Find(flight.Airplane.AirplaneName, viewModel.SegmentName, viewModel.SeatName);
             if(seat == null)
             {
                 return NotFound();
@@ -53,8 +56,10 @@ namespace ISA.Controllers
             Reservation reservation = (
                     from r in _context.Reservations
                     where _context.SeatReservations.Any(
-                            sr => sr.Flight.FlightName == flightName
+                            sr => sr.Flight.FlightName == viewModel.FlightName
+                            && sr.Reservation == r
                         )
+                    && r.ApplicationUser == user
                     select r
                 ).FirstOrDefault();
 
@@ -79,11 +84,11 @@ namespace ISA.Controllers
 
             SeatReservation seatReservation = new SeatReservation {
                 Flight = flight,
-                FirstName = firstName,
-                LastName = lastName,
+                FirstName = viewModel.FirstName,
+                LastName = viewModel.LastName,
                 ApplicationUser = user,
                 Confirmed = true,
-                Passport = passport,
+                Passport = viewModel.Passport,
                 Seat = seat,
                 Reservation = reservation
             };
@@ -92,10 +97,111 @@ namespace ISA.Controllers
             {
                 _context.Add(seatReservation);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Details", "Airline", new { id = flight.Airplane.Airline.AirlineName });
+                return RedirectToAction("Details", "Flight", new { id = flight.FlightName });
             }
             return Forbid();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Invite(InviteViewModel viewModel)
+        {
+            var user = _context.Users.Find((await _userManager.GetUserAsync(HttpContext.User)).Id);
+            var friend = _context.Users.Find(viewModel.FriendId);
+            Flight flight = _context.Flights.Find(viewModel.FlightName);
+            _context.Entry(flight).Reference(f => f.Airplane).Load();
+            _context.Entry(flight.Airplane).Reference(f => f.Airline).Load();
+
+            if (flight == null)
+            {
+                return NotFound();
+            };
+            Seat seat = _context.Seats.Find(flight.Airplane.AirplaneName, viewModel.SegmentName, viewModel.SeatName);
+            if (seat == null)
+            {
+                return NotFound();
+            }
+
+            Reservation reservation = (
+                    from r in _context.Reservations
+                    where _context.SeatReservations.Any(
+                            sr => sr.Flight.FlightName == viewModel.FlightName
+                            && sr.Reservation == r
+                        )
+                    && r.ApplicationUser == user
+                    select r
+                ).FirstOrDefault();
+
+            if (reservation == null)
+            {
+                reservation = new Reservation
+                {
+                    Created = DateTime.Now,
+                    ApplicationUser = user,
+                    TotalPrice = flight.Price
+                };
+
+                if (ModelState.IsValid)
+                {
+                    _context.Add(reservation);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                reservation.TotalPrice += flight.Price;
+            }
+
+            SeatReservation seatReservation = new SeatReservation
+            {
+                Flight = flight,
+                ApplicationUser = friend,
+                Confirmed = false,
+                Seat = seat,
+                Reservation = reservation
+            };
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(seatReservation);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Details", "Flight", new { id = flight.FlightName });
+            }
+            return Forbid();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Answer(AnswerViewModel viewModel)
+        {
+            var user = _context.Users.Find((await _userManager.GetUserAsync(HttpContext.User)).Id);
+            SeatReservation seatReservation = _context.SeatReservations.Where(s => s.SeatReservationId == viewModel.SeatReservationId).FirstOrDefault();
+            _context.Entry(seatReservation).Reference(s => s.Flight).Load();
+            if(seatReservation == null)
+            {
+                return NotFound();
+            }
+
+            if(viewModel.Answer)
+            {
+                seatReservation.Confirmed = true;
+                if (ModelState.IsValid)
+                {
+                    _context.Update(seatReservation);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    _context.SeatReservations.Remove(seatReservation);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+            }
+            return Forbid();
+        }
+
 
         private bool SeatReservationExists(string id)
         {

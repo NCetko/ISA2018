@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ISA.Models.Entities.SeatReservation>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Seat Reservations</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.SeatName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SegmentName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Flight)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SeatName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SegmentName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FlightName)
+            </td>
+            <td>
+                @if (!item.Confirmed) {
+                <form asp-controller="SeatReservation" asp-action="Answer">
+                    <input type="hidden" name="seatReservationId" value="@item.SeatReservationId" />
+                    <input type="hidden" name="segmentName" value="@item.SegmentName" />
+                    <input type="hidden" name="seatName" value="@item.SeatName" />
+                    <input type="text" id="@Html.Raw(item.SeatReservationId)passport" name="passport" placeholder="Passport" required="Required" />
+                    <input type="text" id="@Html.Raw(item.SeatReservationId)firstName" name="firstName" placeholder="First Name" required="Required" />
+                    <input type="text" id="@Html.Raw(item.SeatReservationId)lastName" name="lastName" placeholder="Last Name" required="Required" />
+                    <input id="@Html.Raw(item.SeatReservationId)check" type="checkbox" name="answer" checked="checked" value="true" onchange="_@Html.Raw(item.SeatReservationId)check();"/>
+                    <input type="submit" value="Send Answer" class="btn btn-default" />
+                </form>
+                <script>
+                    function _@Html.Raw(item.SeatReservationId)check() {
+                        if (document.getElementById('@Html.Raw(item.SeatReservationId)check').checked) {
+                            document.getElementById('@Html.Raw(item.SeatReservationId)check').value = true;
+                            document.getElementById('@Html.Raw(item.SeatReservationId)passport').attributes["required"] = "required";
+                            document.getElementById('@Html.Raw(item.SeatReservationId)firstName').attributes["required"] = "required";
+                            document.getElementById('@Html.Raw(item.SeatReservationId)lastName').attributes["required"] = "required";
+                            document.getElementById('@Html.Raw(item.SeatReservationId)passport').disabled = false;
+                            document.getElementById('@Html.Raw(item.SeatReservationId)firstName').disabled = false;
+                            document.getElementById('@Html.Raw(item.SeatReservationId)lastName').disabled = false;
+                        } else {
+                            document.getElementById('@Html.Raw(item.SeatReservationId)check').value = false;
+                            
+                            document.getElementById('@Html.Raw(item.SeatReservationId)passport').attributes["required"] = "";
+                            document.getElementById('@Html.Raw(item.SeatReservationId)firstName').attributes["required"] = "";
+                            document.getElementById('@Html.Raw(item.SeatReservationId)lastName').attributes["required"] = "";
+                            document.getElementById('@Html.Raw(item.SeatReservationId)passport').disabled = true;
+                            document.getElementById('@Html.Raw(item.SeatReservationId)firstName').disabled = true;
+                            document.getElementById('@Html.Raw(item.SeatReservationId)lastName').disabled = true;
+                        }
+                    }
+                </script>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

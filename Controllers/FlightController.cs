@@ -9,15 +9,20 @@ using ISA.Data;
 using ISA.Models.Entities;
 using ISA.Models.FlightViewModels;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Identity;
 
 namespace ISA.Controllers
 {
     public class FlightController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public FlightController(ApplicationDbContext context)
+        public FlightController(
+            UserManager<ApplicationUser> userManager, 
+            ApplicationDbContext context)
         {
+            _userManager = userManager;
             _context = context;
         }
 
@@ -36,14 +41,15 @@ namespace ISA.Controllers
             }
 
             var flight = await _context.Flights
+                .Include(f=>f.Airplane)
+                .Include(f=>f.Airplane.Airline)
+                .Include(f=>f.Airplane.Airline.Provider)
+                .Include(f=>f.DepartureLocation)
+                .Include(f=>f.DepartureLocation.Destination)
+                .Include(f=>f.ArrivalLocation.Destination)
+                .Include(f=>f.ArrivalLocation.Destination)
                 .FirstOrDefaultAsync(m => m.FlightName == id);
 
-            await _context.Entry(flight).Reference(f => f.DepartureLocation).LoadAsync();
-            await _context.Entry(flight.DepartureLocation).Reference(f => f.Destination).LoadAsync();
-            await _context.Entry(flight).Reference(f => f.ArrivalLocation).LoadAsync();
-            await _context.Entry(flight.ArrivalLocation).Reference(f => f.Destination).LoadAsync();
-            await _context.Entry(flight).Reference(f => f.Airplane).LoadAsync();
-            await _context.Entry(flight.Airplane).Reference(f => f.Airline).LoadAsync();
             if (flight == null)
             {
                 return NotFound();
@@ -58,6 +64,17 @@ namespace ISA.Controllers
                 select s
                 ).ToListAsync();
 
+            var user = _context.Users.Find((await _userManager.GetUserAsync(HttpContext.User)).Id);
+
+            var friends = await (
+                from u in _context.Users
+                where _context.Friendships.Any(
+                    fs => (fs.Sender == user || fs.Receiver == user)
+                    && (fs.Sender == u|| fs.Receiver == u))
+                select u).Where(u => u != user)
+                .ToListAsync(); 
+
+            ViewBag.Friends = new SelectList(friends, "Id", "UserName");
             ViewBag.ReservedSeats = reservedSeats;
 
             ViewBag.Segments = _context.Segments.Where(s => s.AirplaneName == flight.Airplane.AirplaneName);

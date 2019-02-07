@@ -65,10 +65,10 @@
             <td>
                 @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == provider)) || User.IsInRole("SysAdmin")))
                 {
-                    <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.FlightName"> Details </a> <span> | </span>
                     <a asp-controller="Flight" asp-action="Edit" asp-route-id="@item.FlightName"> Edit </a> <span> | </span>
-                    <a asp-controller="Flight" asp-action="Delete" asp-route-id="@item.FlightName"> Delete </a>
+                    <a asp-controller="Flight" asp-action="Delete" asp-route-id="@item.FlightName"> Delete </a><span> | </span>
                 }
+                <a asp-controller="Flight" asp-action="Details" asp-route-id="@item.FlightName"> Details </a>
             </td>
         </tr>
         }

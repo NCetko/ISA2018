@@ -25,7 +25,13 @@ namespace ISA.Controllers
         // GET: SeatDiscount
         public async Task<IActionResult> Index()
         {
-            return NotFound();
+            var user = _context.Users.Find((await _userManager.GetUserAsync(HttpContext.User)).Id);
+            return View(
+                await _context.SeatDiscounts
+                .Where(s => s.Reservation.ApplicationUser == user)
+                .Include(sd => sd.Seat)
+                .Include(sd => sd.Flight)
+                .ToListAsync());
         }
 
         // POST: SeatDiscount/Create

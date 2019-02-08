@@ -27,6 +27,7 @@
                     {
                         <li><a asp-area="" asp-controller="Friendship" asp-action="Friends">Friends</a></li>
                         <li><a asp-area="" asp-controller="SeatReservation" asp-action="Index">Seat Reservations</a></li>
+                        <li><a asp-area="" asp-controller="SeatDiscount" asp-action="Index">Seat Discounts</a></li>
                     }
 
                     @if (User.Identity.IsAuthenticated && User.IsInRole("AirAdmin"))

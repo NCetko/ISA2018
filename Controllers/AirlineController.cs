@@ -29,21 +29,70 @@ namespace ISA.Controllers
             return View(await _context.Airlines.Include(a => a.Provider).ToListAsync());
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> Revenue(string id)
+        [HttpGet("/Airline/Sales/{id}/{range}")]
+        public async Task<IActionResult> Sales(string id, int range)
         {
-            ViewBag.StartDate = DateTime.Now;
-            ViewBag.EndDate = DateTime.Now;
-            ViewBag.Valid = false;
-            ViewBag.AirlineName = id;
-            return View();
+            if (!(range == 1 || range == 7 || range == 30))
+            {
+                return NotFound();
+            }
+
+            switch (range)
+            {
+                case 1:
+                    {
+                        ViewBag.Range = "Daily sales";
+                        ViewBag.Labels = "labels: [newDate(-1),newDate(-0.75),newDate(-0.5),newDate(-0.25),newDate(0)],";
+                        break;
+                    }
+                case 7:
+                    {
+                        ViewBag.Range = "Weekly sales";
+                        ViewBag.Labels = "labels: [newDate(-7),newDate(-6),newDate(-5),newDate(-4),newDate(-3)," +
+                                         "newDate(-2),newDate(-1),newDate(0)],";
+                        break;
+                    }
+                case 30:
+                    {
+                        ViewBag.Range = "Monthly sales";
+                        ViewBag.Labels = "labels: [newDate(-30),newDate(-25),newDate(-20),newDate(-15)," +
+                                         "newDate(-10),newDate(-5),newDate(0)],";
+                        break;
+                    }
+            }
+
+            DateTime startDate = DateTime.Now.AddDays(-range).Date;
+            DateTime endDate = DateTime.Now.Date;
+
+            List<SalesViewModel> viewModel = new List<SalesViewModel>();
+
+            List<Reservation> reserevations = await _context.Reservations
+                .Where(r => r.Airline.AirlineName == id)
+                .Where(r => r.Created.Date >= startDate && r.Created.Date <= endDate)
+                .Include(r => r.SeatReservations)
+                .ToListAsync();
+
+            foreach (var reservation in reserevations)
+            {
+                int count = reservation.SeatReservations.Where(r=>r.Confirmed==true).Count();
+                count += _context.SeatDiscounts.Where(d => d.Reservation == reservation).ToList().Count();
+
+                viewModel.Add(
+                    new SalesViewModel
+                    {
+                        Count = count,
+                        Date = reservation.Created.ToString("MM/dd/yyyy") + " " + reservation.Created.ToString("HH:mm")
+                    }
+                    );
+            }
+
+            return View(viewModel);
         }
 
-        [HttpPost("/Airline/Revenue/{id}")]
-        public async Task<IActionResult> Revenue(string id, RevenueViewModel viewModel)
+        [HttpGet("/Airline/Revenue/{id}/{startDate?}/{endDate?}")]
+        public async Task<IActionResult> Revenue(string id, DateTime? startDate, DateTime? endDate)
         {
-            if (viewModel.StartDate == null || viewModel.EndDate == null)
+            if (startDate == null || endDate == null)
             {
                 ViewBag.StartDate = DateTime.Now;
                 ViewBag.EndDate = DateTime.Now;
@@ -56,7 +105,7 @@ namespace ISA.Controllers
             try
             {
                 revenue = await _context.Reservations
-                    .Where(r => r.Created > viewModel.StartDate && r.Created < viewModel.EndDate)
+                    .Where(r => r.Created > startDate && r.Created < endDate)
                     .Where(r => r.Airline.AirlineName == id)
                     .SumAsync(r => r.TotalPrice);
 
@@ -67,8 +116,8 @@ namespace ISA.Controllers
             }
 
             ViewBag.Revenue = revenue;
-            ViewBag.StartDate = viewModel.StartDate;
-            ViewBag.EndDate = viewModel.EndDate;
+            ViewBag.StartDate = startDate;
+            ViewBag.EndDate = endDate;
             return View();
         }
 

@@ -115,9 +115,9 @@
         <input type="submit" value="Add Discount" class="btn btn-default" />
     </form>
     <form asp-controller="SeatReservation" style="display:none" asp-action="Create" id="reservationForm">
-        <input type="text" name="passport" placeholder="Passport" data-val-required="Required"/>
-        <input type="text" name="firstName" placeholder="First Name" data-val-required="Required"/>
-        <input type="text" name="lastName" placeholder="Last Name" data-val-required="Required"/>
+        <input type="text" name="passport" placeholder="Passport" required="Required"/>
+        <input type="text" name="firstName" placeholder="First Name" required="Required"/>
+        <input type="text" name="lastName" placeholder="Last Name" required="Required"/>
         <input type="hidden" name="flightName" value="@Model.FlightName" />
         <input type="hidden" id="reservationSegmentName" name="segmentName" />
         <input type="hidden" id="reservationSeatName" name="seatName" />
@@ -233,6 +233,7 @@
                             document.getElementById('reservationSeatName').value = '';
                             document.getElementById('reserved').style.display = "block";
                             document.getElementById('reservationForm').style.display = "none";
+                            document.getElementById('inviteForm').style.display = "none";
                         </text>
                     }
                     else

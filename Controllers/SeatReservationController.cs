@@ -68,7 +68,8 @@ namespace ISA.Controllers
                 reservation = new Reservation {
                     Created = DateTime.Now,
                     ApplicationUser = user,
-                    TotalPrice = flight.Price
+                    TotalPrice = flight.Price,
+                    Airline = flight.Airplane.Airline
                 };
 
                 if (ModelState.IsValid)

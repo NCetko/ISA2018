@@ -64,10 +64,18 @@
                     }
                 </td>
                 <td>
-                    @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == item.Provider))|| User.IsInRole("SysAdmin")))
+                    @if (User.Identity.IsAuthenticated && ((User.IsInRole("AirAdmin") && Context.Administration.Any(a => a.ApplicationUserId == userId && a.Provider == item.Provider)) || User.IsInRole("SysAdmin")))
                     {
-                    <a asp-action="Edit" asp-route-id="@item.AirlineName">Edit</a>
-                    <span> | </span>
+                        <a asp-action="Sales" asp-route-id="@item.AirlineName" asp-route-range="1">Daily Sales</a>
+                        <span> | </span>
+                        <a asp-action="Sales" asp-route-id="@item.AirlineName" asp-route-range="7">Weekly Sales</a>
+                        <span> | </span>
+                        <a asp-action="Sales" asp-route-id="@item.AirlineName" asp-route-range="30">Monthly Sales</a>
+                        <span> | </span>
+                        <a asp-action="Revenue" asp-route-id="@item.AirlineName">Revenue</a>
+                        <span> | </span>
+                        <a asp-action="Edit" asp-route-id="@item.AirlineName">Edit</a>
+                        <span> | </span>
                     }
                     <a asp-action="Details" asp-route-id="@item.AirlineName">Details</a>
                     @if (User.Identity.IsAuthenticated && User.IsInRole("SysAdmin"))

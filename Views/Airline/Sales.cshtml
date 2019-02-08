@@ -1,0 +1,98 @@
+﻿@model IEnumerable<ISA.Models.AirlineViewModels.SalesViewModel>
+
+@{
+    ViewData["Title"] = "Sales";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="@Url.Content("~/lib/moment.min.js")"></script>
+<script src="@Url.Content("~/lib/Chart.js")"></script>
+<script src="@Url.Content("~/lib/utils.js")"></script>
+
+<h2>@ViewBag.Range</h2>
+
+@if (Model.Count() > 0)
+{
+    <div style="width:75%;">
+        <canvas id="canvas"></canvas>
+    </div>
+    <br />
+    <br />
+    <script>
+    var timeFormat = 'MM/DD/YYYY HH:mm';
+
+    function newDate(days) {
+        return moment().add(days, 'd').toDate();
+    }
+
+    function newDateString(days) {
+        return moment().add(days, 'd').format(timeFormat);
+    }
+
+    var color = Chart.helpers.color;
+    var config = {
+        type: 'line',
+        data: {@ViewBag.Labels
+            datasets: [{
+                label: '@ViewBag.Range',
+                backgroundColor: color(window.chartColors.green).alpha(0.5).rgbString(),
+                borderColor: window.chartColors.green,
+                fill: false,
+                data: [
+                @{
+                    foreach (var item in Model)
+                    {
+                        <text>{x:'</text>@Html.Raw(item.Date)<text>',y:'</text>@Html.Raw(item.Count)<text>'},</text>
+                    }
+                }
+                ],
+            }]
+        },
+        options: {
+            elements: {
+                line: {
+                    tension: 0, // bezier curves
+                }
+            },
+            title: {
+                text: '@ViewBag.Range'
+            },
+            scales: {
+                xAxes: [{
+                    type: 'time',
+                    time: {
+                        format: timeFormat,
+                        // round: 'day'
+                        tooltipFormat: 'll HH:mm'
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Date'
+                    }
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Count tickets'
+                    },
+                    ticks: {
+                        min: 0
+                    }
+                }]
+            }
+        }
+    };
+
+    window.onload = function () {
+        var ctx = document.getElementById('canvas').getContext('2d');
+        window.myLine = new Chart(ctx, config);
+
+    };
+    </script>
+}
+else
+{
+    <text>There is no data for this range.</text>
+}
+
+

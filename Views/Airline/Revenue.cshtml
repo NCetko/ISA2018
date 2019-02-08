@@ -13,7 +13,7 @@
             <p>Revenue between @ViewBag.StartDate and @ViewBag.EndDate: @ViewBag.Revenue</p>
         }
         <hr/>
-        <form asp-action="Revenue">
+        <form asp-action="Revenue" method="get">
             <div class="form-group">
                 <p>Start Date</p>
                 <input type="datetime" name="startDate" value="@ViewBag.StartDate" />

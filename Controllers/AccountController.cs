@@ -62,6 +62,18 @@ namespace ISA.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
+                var user = _context.Users.Where(u => u.UserName == model.Email).FirstOrDefault();
+
+                if (user.PasswordExpired)
+                {
+                    var passwordResult = await _userManager.CheckPasswordAsync(user, model.Password);
+
+                    if(passwordResult)
+                    {
+                        var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                        return RedirectToAction(nameof(ResetPassword), new { code });
+                    }
+                }
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -274,6 +286,11 @@ namespace ISA.Controllers
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
+                var userModel = _context.Users.Where(u => u.UserName == model.Email).FirstOrDefault();
+                userModel.PasswordExpired = false;
+                _context.Update(userModel);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(ResetPasswordConfirmation));
             }
             AddErrors(result);

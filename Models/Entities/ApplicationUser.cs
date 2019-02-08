@@ -29,6 +29,8 @@ namespace ISA.Models.Entities
         [StringLength(100)]
         public string Address { get; set; }
 
+        public bool PasswordExpired { get; set; }
+
         [Required(ErrorMessage = "Required")]
         [Range(0, int.MaxValue)]
         public int Points { get; set; }

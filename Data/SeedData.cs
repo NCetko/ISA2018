@@ -689,7 +689,8 @@ namespace ISA.Data
                         FirstName = "admin",
                         LastName = "admin",
                         Address = "Some Address",
-                        PhoneNumber = "0123"
+                        PhoneNumber = "0123",
+                        PasswordExpired = true
                     };
 
                     var user = await UserManager.FindByEmailAsync(userEmail);

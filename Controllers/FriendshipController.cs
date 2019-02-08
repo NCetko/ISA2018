@@ -121,6 +121,8 @@ namespace ISA.Controllers
             }
 
             var friendship = _context.Friendships.Find(sender, reciever);
+            _context.Entry(friendship).Reference(f => f.Sender).Load();
+            _context.Entry(friendship).Reference(f => f.Receiver).Load();
             if (friendship == null)
             {
                 return NotFound();

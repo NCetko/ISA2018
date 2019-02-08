@@ -162,7 +162,8 @@ namespace ISA.Controllers
                 {
                     Created = DateTime.Now,
                     ApplicationUser = user,
-                    TotalPrice = flight.Price
+                    TotalPrice = flight.Price,
+                    Airline = flight.Airplane.Airline
                 };
 
                 if (ModelState.IsValid)

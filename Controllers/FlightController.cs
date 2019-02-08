@@ -19,7 +19,7 @@ namespace ISA.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         public FlightController(
-            UserManager<ApplicationUser> userManager, 
+            UserManager<ApplicationUser> userManager,
             ApplicationDbContext context)
         {
             _userManager = userManager;
@@ -27,9 +27,38 @@ namespace ISA.Controllers
         }
 
         // GET: Flight
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Filter(FilterViewModel filterViewModel)
         {
-            return View(await _context.Flights.ToListAsync());
+            List<FlightViewModel> viewModel = new List<FlightViewModel>();
+            
+            if (filterViewModel.MaxStops == 1)
+            {
+                var flights = await _context.Flights
+                    .Where(f => f.Arrival.Date == filterViewModel.Arrival.Date && f.Departure.Date == filterViewModel.Departure.Date)
+                    .Where(f => f.ArrivalLocation.Destination.DestinationName == filterViewModel.Destination)
+                    .Where(f => f.DepartureLocation.Destination.DestinationName == filterViewModel.Origin)
+                    .Include(f => f.DepartureLocation)
+                    .Include(f => f.DepartureLocation.Destination)
+                    .Include(f => f.ArrivalLocation)
+                    .Include(f => f.ArrivalLocation.Destination)
+                    .ToListAsync();
+
+                foreach(var flight in flights)
+                {
+                    FlightViewModel flightViewModel = new FlightViewModel {
+                        Arrival = flight.Arrival,
+                        Departure = flight.Departure,
+                        Price = flight.Price
+                    };
+
+                    flightViewModel.Flights.Add(flight);
+
+                    viewModel.Add(flightViewModel);
+                }
+            }
+            
+            return View(viewModel);
         }
 
         // GET: Flight/Details/5
@@ -41,13 +70,13 @@ namespace ISA.Controllers
             }
 
             var flight = await _context.Flights
-                .Include(f=>f.Airplane)
-                .Include(f=>f.Airplane.Airline)
-                .Include(f=>f.Airplane.Airline.Provider)
-                .Include(f=>f.DepartureLocation)
-                .Include(f=>f.DepartureLocation.Destination)
-                .Include(f=>f.ArrivalLocation.Destination)
-                .Include(f=>f.ArrivalLocation.Destination)
+                .Include(f => f.Airplane)
+                .Include(f => f.Airplane.Airline)
+                .Include(f => f.Airplane.Airline.Provider)
+                .Include(f => f.DepartureLocation)
+                .Include(f => f.DepartureLocation.Destination)
+                .Include(f => f.ArrivalLocation.Destination)
+                .Include(f => f.ArrivalLocation.Destination)
                 .FirstOrDefaultAsync(m => m.FlightName == id);
 
             if (flight == null)
@@ -70,9 +99,9 @@ namespace ISA.Controllers
                 from u in _context.Users
                 where _context.Friendships.Any(
                     fs => (fs.Sender == user || fs.Receiver == user)
-                    && (fs.Sender == u|| fs.Receiver == u))
+                    && (fs.Sender == u || fs.Receiver == u))
                 select u).Where(u => u != user)
-                .ToListAsync(); 
+                .ToListAsync();
 
             ViewBag.Friends = new SelectList(friends, "Id", "UserName");
             ViewBag.ReservedSeats = reservedSeats;
@@ -87,7 +116,7 @@ namespace ISA.Controllers
                     .Average(r => r.Value);
                 ViewBag.Score = score;
             }
-            catch{}
+            catch { }
 
             return View(flight);
         }
@@ -162,7 +191,8 @@ namespace ISA.Controllers
 
             if (ModelState.IsValid)
             {
-                try{
+                try
+                {
                     _context.Add(flight);
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Details", "Airline", new { id = airlineName });
@@ -213,7 +243,8 @@ namespace ISA.Controllers
                                 select d).ToList();
             ViewBag.Destinations = new SelectList(destinations, "DestinationName", "DestinationName");
 
-            var viewModel = new CreateViewModel {
+            var viewModel = new CreateViewModel
+            {
                 AirlineName = flight.Airplane.Airline.AirlineName,
                 AirplaneName = flight.Airplane.AirplaneName,
                 Arrival = flight.Arrival,
@@ -227,7 +258,7 @@ namespace ISA.Controllers
                 KM = flight.KM,
                 Price = flight.Price,
                 Services = flight.Services
-            }; 
+            };
 
             return View(viewModel);
         }
@@ -306,7 +337,7 @@ namespace ISA.Controllers
             var flight = await _context.Flights.FindAsync(id);
             _context.Flights.Remove(flight);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Details", "Airline", new { id = flight.Airplane.Airline.AirlineName});
+            return RedirectToAction("Details", "Airline", new { id = flight.Airplane.Airline.AirlineName });
         }
 
         private bool FlightExists(string id)

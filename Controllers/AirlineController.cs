@@ -26,6 +26,9 @@ namespace ISA.Controllers
         // GET: Airline
         public async Task<IActionResult> Index()
         {
+            var destinations = _context.Destinations.ToList();
+            ViewBag.Destinations = new SelectList(destinations, "DestinationName", "DestinationName");
+
             return View(await _context.Airlines.Include(a => a.Provider).ToListAsync());
         }
 

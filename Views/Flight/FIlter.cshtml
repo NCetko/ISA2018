@@ -1,0 +1,77 @@
+﻿@model IEnumerable<ISA.Models.FlightViewModels.FlightViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Departure)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Arrival)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Departure)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Arrival)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Flight Name
+                                </th>
+                                <th>
+                                    Origin
+                                </th>
+                                <th>
+                                    Destinatin
+                                </th>
+                                <th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var flight in item.Flights)
+                            {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => flight.FlightName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => flight.DepartureLocation.Destination.DestinationName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => flight.ArrivalLocation.Destination.DestinationName)
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@flight.FlightName">Details</a>
+                                </td>
+                            </tr>
+                            }
+                            </tbody>
+                    </table>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
